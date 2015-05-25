@@ -1,43 +1,51 @@
 (function() {
+	//画像パスの連想配列を用意する
+	var imagePath ={
+			ocean:"resources/pipo-battlebg009.jpg",
+			stoneTile:"resources/pipo-battlebg010.jpg",
+			mystery:"resources/map00.png",
+			pirate0:"resources/pirate00thumb.png",
+			pirate1:"resources/pirate01thumb.png",
+			pirate2:"resources/pirate02thumb.png",
+			pirate3:"resources/pirate03thumb.png"
+	}
     /* detect a dollar object or create one if not found */
     window.StageData = [
         {
             startPositions: [
                 {type: "captain", i: 1, j: 8},
             ],
-            stageBackground:"resources/pipo-battlebg009.jpg"
+            stageBackground:imagePath.stoneTile
         },
         {
             startPositions: [
-//                {type: "captain", i: 12, j: 0},
                 {type: "hayai", i: 12, j: 2},
             ],
-            stageBackground:"resources/pipo-battlebg010.jpg"
+            stageBackground:imagePath.mystery
         },
         {
         	startPositions: [
-//                {type: "captain", i: 12, j: 0},
-					{type: "hayai", i: 12, j: 2},
+                {type: "captain", i: 12, j: 0},
+				{type: "hayai", i: 12, j: 2},
 			],
-			stageBackground:"resources/map00.png"
+			stageBackground:imagePath.ocean
         }
     ];
     
     //ステージ間デモのデータ
     window.DemoData = [
                        [
-                        {message:"第1ステージ開始です",portrait:"画像パス"},
-                        {message:"はりきっていきましょう",portrait:"画像パス"},
-                        {message:"",portrait:"画像パス"}
+                        {message:"第1ステージ開始です",portrait:imagePath.pirate0},
+                        {message:"はりきっていきましょう",portrait:imagePath.pirate1}
                         ],
                         [
-                        {message:"第2ステージ開始です",portrait:"画像パス"},
-                        {message:"まだまだこれからですよ",portrait:"画像パス"},
-                        {message:"負けないでくださいね",portrait:"画像パス"}
+                        {message:"第2ステージ開始です",portrait:imagePath.pirate1},
+                        {message:"まだまだこれからですよ",portrait:imagePath.pirate3},
+                        {message:"負けないでくださいね",portrait:imagePath.pirate2}
                         ],
                        [
-                        {message:"第3ステージ開始です",portrait:"画像パス"},
-                        {message:"まだまだいけますよね",portrait:"画像パス"}
+                        {message:"第3ステージ開始です",portrait:imagePath.pirate0},
+                        {message:"まだまだいけますよね",portrait:imagePath.pirate0}
                         ]
     ];
     

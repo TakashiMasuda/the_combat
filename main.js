@@ -12,11 +12,43 @@ TO_UP_FRAME = [2,2,2,3,3,3,2,2,2,3,3,3];
 TO_LOW_FRAME = [4,4,4,5,5,5,4,4,4,5,5,5];
 TO_SIDE_FRAME = [0,0,0,1,1,1,0,0,0,1,1,1];
 
+//ゲーム画面の高さと幅の定数を作成する
+GAME_SCREEN_WIDTH = 960;
+GAME_SCREEN_HEIGHT = 640;
+
+//マス目の1辺の長さ
+TIP_LENGTH = 64;
+	
+//ユニットの行動順番を表示する領域の座標の定数2つ
+UNITTURN_X = TIP_LENGTH * 10;
+UNITTURN_Y = TIP_LENGTH * 8;
+
+//ゲームのフレームレートを定数にする
+FRAME_RATE = 30;
+
+//行動順リストの行動待ちユニット画像の透過度
+WAITING_UNIT_OPACITY = 0.5;
+//行動順リストの背景の透過度
+TURNBACK_OPACITY = 0.75;
+
+//フォント設定
+//フォントの設定データを作成する
+NORMAL_FONT_STYLE = "32px 'ＭＳ ゴシック', arial, sans-serif";
+//ステージデモのフォントを作成する
+DEMO_FONT_STYLE = "24px 'ＭＳ Pゴシック', arial, sans-serif";
+//ステージデモのメッセージ1行の文字数
+MESSAGE_NUMBER_PER_LINE = 7;
+//ステージデモのメッセージ1行分の高さ
+DEMOWINDOW_LABEL_HEIGHT = 30;
+//ウィンドウのマージン
+WINDOW_MARGIN = 40;
+
 //ウィンドウロード時のイベント
 window.onload = function(){
-
-    var game = new Core(960, 640);	//ゲームのそのもののオブジェクトを作る。この時に解像度も指定する
-    game.fps = 30; //fps 一秒に何回を画面更新する
+	
+	//ゲームのそのもののオブジェクトを作る。この時に解像度も指定する
+    var game = new Core(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+    game.fps = FRAME_RATE; //fps 一秒に何回を画面更新する
 
     /**
      * 必要なファイルを相対パスで引数に指定する。 ファイルはすべて、ゲームが始まる前にロードされる。
@@ -62,9 +94,23 @@ window.onload = function(){
         "resources/pirate02.png",
         "resources/pirate03.png",
     ];
+    
     //ループしてプリロードする
     for (var i=0; i < pirateSprites.length; ++i) {
-        game.preload(pirateSprites[i]);
+    	game.preload(pirateSprites[i]);
+    }
+    
+    //海賊の画像パスの配列
+    var pirateSpritesthumb = [
+                         "resources/pirate00thumb.png",
+                         "resources/pirate01thumb.png",
+                         "resources/pirate02thumb.png",
+                         "resources/pirate03thumb.png",
+                         ];
+    
+    //ループしてプリロードする
+    for (var i=0; i < pirateSpritesthumb.length; ++i) {
+        game.preload(pirateSpritesthumb[i]);
     }
 
     //海賊のちびキャラ画像パスの配列
@@ -204,9 +250,6 @@ window.onload = function(){
     var sndChangeShips    = "resources/sound/se4.wav";
     game.preload(sndChangeShips);
 
-    //フォントの設定データを作成する
-    var fontStyle = "32px 'ＭＳ ゴシック', arial, sans-serif";
-
     /**
      * 頻繁に使う関数群
      */
@@ -238,7 +281,7 @@ window.onload = function(){
         	//すでに操作不能状態にしていなければ
             if (!utils.shieldSprite) {
             	//操作不能のベールのスプライトを作る
-                var shieldSprite = new Sprite(960, 640);
+                var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
                 //真っ黒の画像をセットする
                 shieldSprite.image = game.assets[ui1x1Black];
                 //透過度を0にする
@@ -278,9 +321,13 @@ window.onload = function(){
      */
     var GameMap = Class.create({
     	//コンストラクタ
-        initialize: function(scene, mapData) {
+        initialize: function(scene, mapData, gm) {
+        	//シーンへの参照を登録する
+        	this.scene = scene;
+        	//GameManagerへの参照を登録する
+        	this.gm = gm;
             // 枠のスプライトを作り、画像をセットする
-            var frame = new Sprite(960, 640);
+            var frame = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
             frame.image = game.assets[mapFrame];
             
             //シーンに枠のスプライトを追加する
@@ -291,19 +338,20 @@ window.onload = function(){
             
             
             // 背景
-            var background = new Sprite(64*13, 64*9);
-            background.image = game.assets[ocean];
+            var background = new Sprite(TIP_LENGTH*13, TIP_LENGTH*9);
+            //ステージデータから背景のパスを持ってきてセットする
+            background.image = game.assets[StageData[0]["stageBackground"]];
             //枠の位置を考慮した座標をセットする
-            background.x = 64;
+            background.x = TIP_LENGTH;
             background.y = 10;
             
             scene.addChild(background);
             this.background = background;
 
             // マス。Mapクラスを利用してマス目状にスプライトを配置できるようにする
-            var tiles = new Map(64, 64);
+            var tiles = new Map(TIP_LENGTH, TIP_LENGTH);
             tiles.image = game.assets[mapTiles];
-            tiles.x = 64;
+            tiles.x = TIP_LENGTH;
             tiles.y = 10;
             //マップデータをロードする
             tiles.loadData(mapData);
@@ -456,8 +504,8 @@ window.onload = function(){
         getMapTileAtPosition: function(localX, localY) {
         	//ローカル座標をマス目の大きさで割ってマス目を割り出し、オブジェクトで返す
         	return {
-                i: Math.floor(localX/64),
-                j: Math.floor(localY/64)
+                i: Math.floor(localX/TIP_LENGTH),
+                j: Math.floor(localY/TIP_LENGTH)
             };
         },
 
@@ -465,8 +513,8 @@ window.onload = function(){
         getMapPositionAtTile: function(i,j) {
         	//マス目の大きさとマス目の座標をかけて座標を割り出し、オブジェクトで返す
             return {
-                localX: i *64,
-                localY: j *64
+                localX: i *TIP_LENGTH,
+                localY: j *TIP_LENGTH
             };
         },
 
@@ -511,26 +559,27 @@ window.onload = function(){
 
         //ユニットの向きを変える関数
         changeDirection:function(fune, i, j){
+        	var unit = fune.fune;		//ユニットのデータを変数に入れる
         	//前のマスの座標を得る
-        	var beforeI = fune.i;
-        	var beforeJ = fune.j;
+        	var beforeI = unit.i;
+        	var beforeJ = unit.j;
         	
         	//上に進むなら
         	if(beforeI < i){
-        		fune.frame.TO_UP_FRAME;	//ユニットのアニメのフレームを上向きのものにする
+        		unit.frame = TO_UP_FRAME;	//ユニットのアニメのフレームを上向きのものにする
         	//下に進むなら
         	} else if(beforeI < i){
-        		fune.frame.TO_UP_FRAME;	//ユニットのアニメのフレームを上向きのものにする
+        		unit.frame = TO_UP_FRAME;	//ユニットのアニメのフレームを上向きのものにする
         	//左右に進むなら
         	} else {
-        		fune.frame.TO_SIDE_FRAME;	//ユニットのアニメのフレームを上向きのものにする
+        		unit.frame = TO_SIDE_FRAME;	//ユニットのアニメのフレームを上向きのものにする
         		//右に進むなら
         		if(beforeJ > j){
-        			//ユニットを通常の方向に向ける
-        			fune.scaleX = 1;
-        		} else {
         			//ユニットを逆の方向に向ける
-        			fune.scaleX = -1;
+        			unit.scaleX = -1;
+        		} else {
+        			//ユニットを通常の方向に向ける
+        			unit.scaleX = 1;
         		}
         	}
         },
@@ -551,7 +600,7 @@ window.onload = function(){
                 var worldPosition = this.toWorldSpace(postion.localX, postion.localY);
                 
                 //ユニットの向きを変える
-                changeDirection(fune, i, j);
+                this.changeDirection(fune, i, j);
                 
                 //船の位置をセットする
                 fune.i = i;
@@ -717,7 +766,7 @@ window.onload = function(){
             //移動可能判定のマークがでていなければ
             if (this.mapMarker == undefined) {
             	//マークを作り、overLayeに追加する
-                this.mapMarker = new Sprite(64, 64);
+                this.mapMarker = new Sprite(TIP_LENGTH, TIP_LENGTH);
                 this.mapMarker.image = game.assets[mapUI];
                 //座標をセットする
                 this.positonObject(this.mapMarker, tile.i, tile.j);
@@ -776,7 +825,7 @@ window.onload = function(){
                 var nextPostion = moveList[positionIndex];
 
                 //マスに重ねるスプライトを生成する
-                var areaSprite = new Sprite(64, 64);
+                var areaSprite = new Sprite(TIP_LENGTH, TIP_LENGTH);
                 //タッチイベントを起こさないようにする
                 areaSprite.touchEnabled = false;
                 areaSprite.image = game.assets[mapUI];
@@ -888,42 +937,65 @@ window.onload = function(){
         
         //ユニットの行動順を表示する関数
         showUnitTurn:function(units, x, y){
-        	//行動順表示領域のスプライトを作る
-        	var turnBack = new Sprite(64 * units, 64);
-        	//この関数の引数で指定された座標をこのスプライトの座標に設定する
-        	turnBack.x = x;
-        	turnBack.y = y;
-        	//画像をセットする
-        	turnBack.image = assets[ui1xBlack];
-        	//画面に作成したスプライトを追加する
-        	scene.addChild(turnBack);
+        	//初めて呼ばれたら
+        	if(this.turnBack === void(0)){
+        		//行動順表示領域のスプライトを作る
+        		var turnBack = new Sprite(TIP_LENGTH * units, TIP_LENGTH);
+        		//この関数の引数で指定された座標をこのスプライトの座標に設定する
+        		turnBack.x = x;
+        		turnBack.y = y;
+        		//真っ黒にしないために、透過する
+        		turnBack.opacity = TURNBACK_OPACITY;
+        		//画像をセットする
+        		turnBack.image = game.assets[ui1x1Black];
+        		//画面に作成したスプライトを追加する
+        		this.scene.addChild(turnBack);
+        		this.turnBack = turnBack;	//このスプライトへの参照をマップに保存する
+        	}
         	
         	//行動順リストを走査する
         	for(var i = 0; i < units; i++){
         		var unitIndex = 'unit' + i;	//オブジェクト保存用のキー名の文字列を作る
+        		//シーンから前に作ったユニットのスプライトを削除する
+        		this.scene.removeChild(this[unitIndex]);
         		//ユニットのスプライトへの参照を保存しているキーの値をnullにする
         		this[unitIndex] = null;
         		//表示するユニットの行動準リスト内での番号を取得する
-        		var current = activeUnit + i;
+        		var currentUnit = this.gm.activeUnit + i;
+        		//行動順リストを取得する
+        		var turnList = this.gm.turnList;
+        		//行動順リストの要素数を取得する
+        		var turnListLength = turnList.length;
         		//currentUnitが行動順リストの最後の番号を超えている
-        		if(currentUnit > turnList.length){
+        		if(currentUnit >= turnListLength){
         			//番号をリストの最初からにする
-        			currentUnit -= turnList.length();
+        			currentUnit -= turnListLength;
         		}
-        		
         		//ユニットの順番表示用のスプライトを作る
-        		var unitTurn = new Sprite(64, 64);
+        		var unitTurn = new Sprite(TIP_LENGTH, TIP_LENGTH);
         		//順番リストからユニットを取得する
         		var unit = turnList[currentUnit]['unit'];
-        		var image = unit.image;	//ユニットの画像を取得する
-        		unitTurn.image = image;	//ユニットの画像を順番領域のユニットスプライトにセットする
+        		var image = unit.fune.image;		//ユニットの画像を取得する
+        		unitTurn.image = image;				//ユニットの画像を順番領域のユニットスプライトにセットする
+        		unitTurn.frame = unit.fune.frame;	//アニメーションのフレームをセットする
+        		
+        		//現在行動ターンではないユニットのスプライトであれば
+        		if(i != 0){
+        			unitTurn.opacity = WAITING_UNIT_OPACITY;	//少し透過する
+        		}
+        		
+        		//プレイヤー1のユニットでなければ
+        		if(unit.player.id != 1){
+        			unitTurn.scaleX = -1;	//向きを反転させる
+        		}
+        		
         		//スプライトの座標をセットする
-        		unitTurn.x = x + 64 * i;
+        		unitTurn.x = x + TIP_LENGTH * i;
         		unitTurn.y = y;
         		
-        		scene.addChild(unitTurn);	//作成したスプライトを画面に追加する
+        		this.scene.addChild(unitTurn);	//作成したスプライトを画面に追加する
         		//作成したユニットのスプライトへの参照をマップのオブジェクトに追加する
-        		this[unitindex] = unitTurn;
+        		this[unitIndex] = unitTurn;
         	}
         }
     });
@@ -937,7 +1009,7 @@ window.onload = function(){
         initialize: function(id, stats) {
             Group.call(this);	//スーパークラスのコンストラクタを実行する
 
-            var fune = new Sprite(64, 64);	//スプライトを作成する
+            var fune = new Sprite(TIP_LENGTH, TIP_LENGTH);	//スプライトを作成する
             this.fune = fune;				//自身の参照を持たせる
             fune.image = game.assets[shipsSpriteSheet];	//画像をセットする
             //アニメーション用のフレームをセットする
@@ -947,24 +1019,24 @@ window.onload = function(){
             this.addChild(fune);	//作成した船データを追加する
 
             //HPバーを作成する
-            var healthBackSprite   = new Sprite(64, 12);
+            var healthBackSprite   = new Sprite(TIP_LENGTH, 12);
             this.healthBackSprite  = healthBackSprite;
             healthBackSprite.image = game.assets[uiHealthBack];
-            healthBackSprite.y     = 64 -6;
+            healthBackSprite.y     = TIP_LENGTH -6;
             this.addChild(healthBackSprite);
 
-            var healthRedSprite   = new Sprite(64, 12);
+            var healthRedSprite   = new Sprite(TIP_LENGTH, 12);
             this.healthRedSprite  = healthRedSprite;
             healthRedSprite.originX = 0
             healthRedSprite.image = game.assets[uiHealthRed];
-            healthRedSprite.y     = 64 -6;
+            healthRedSprite.y     = TIP_LENGTH -6;
             this.addChild(healthRedSprite);
 
-            var healthGreenSprite   = new Sprite(64, 12);
+            var healthGreenSprite   = new Sprite(TIP_LENGTH, 12);
             this.healthGreenSprite  = healthGreenSprite;
             healthGreenSprite.originX = 0
             healthGreenSprite.image = game.assets[uiHealthGreen];
-            healthGreenSprite.y     = 64 -6;
+            healthGreenSprite.y     = TIP_LENGTH -6;
             this.addChild(healthGreenSprite);
 
             //ステータスを設定する
@@ -975,6 +1047,7 @@ window.onload = function(){
                 attack:    stats.attack,
                 defense:   stats.defense,
                 hpMax:     stats.hpMax,
+                speed:     stats.speed
             };
             //初期HPを設定する
             this.stats.hp = this.stats.hpMax;
@@ -1014,6 +1087,12 @@ window.onload = function(){
             return this.stats.hp;
         },
 
+        //ユニットの素早さを取得する
+        getSpeed: function() {
+        	//素早さを取得して返す
+        	return this.stats.speed;
+        },
+        
         getCaptainName: function() {
             return "無名";
         },
@@ -1142,24 +1221,29 @@ window.onload = function(){
         ontouchend: function(params) {
         	//アクティブプレイヤーの船が対象なら
             if (this.player.isActive()) {
-                if (this.player.getActiveFune() == this) {
-                	//ステータスウィンドウを出す
-                    var popup = new FunePopup(this);
-                    popup.onCancel = function() {
-
-                    }
-                    var self = this;
-                    //必殺技ボタンをクリックしたイベント
-                    popup.onSkill = function() {
-                        if (self.canUseSkill()) {
-                            self.activateSkill(function() {
-                                self.player.controller.endTurn();
-                            })
-                        }
-                    }
-                } else {
-                    this.player.setActiveFune(this);
+            	//@mod 2015.0525 T.Masuda 条件文削除
+//                if (this.player.getActiveFune() == this) {
+//              ステータスウィンドウを出す
+                var popup = new FunePopup(this);
+                popup.onCancel = function() {
                 }
+                var self = this;
+                //必殺技ボタンをクリックしたイベント
+                popup.onSkill = function() {
+                	//@mod 2015.0525 条件式&&以下を追加しました。
+                	//スキルが使える状態かつ、現在行動中のユニットなら
+                    if (self.canUseSkill() && self.player.activeFune() === self) {
+                    	//スキルを発動する
+                        self.activateSkill(function() {
+                        	//コールバック関数。ターンを終える
+                            self.player.controller.endTurn();
+                        })
+                    }
+                }
+            //@mod 2015.0525 T.Masuda 条件文削除
+//            else {
+//                    this.player.setActiveFune(this);
+//                }
             //相手の船なら攻撃処理を行う
             } else {
                 var activePlayer = this.player.controller.getActivePlayer();
@@ -1167,7 +1251,8 @@ window.onload = function(){
                 if (activeFune.withinRange(this.i, this.j)) {
                     activeFune.attackFune(this);
                 } else {
-                    new AlertWindow("攻撃は届けません", this.player.controller);
+                	//@mod 2015.0525 T.Masuda メッセージを変更しました
+                    new AlertWindow("攻撃の範囲外です。", this.player.controller);
                 }
             }
         },
@@ -1182,7 +1267,7 @@ window.onload = function(){
             if (this.scaleX > 0) {
                 pirateChibi.x = -50;
             } else {
-                pirateChibi.x = 960 -512 +50;
+                pirateChibi.x = GAME_SCREEN_WIDTH -512 +50;
             }
             var alertWindow = new AlertWindow(this.getSkillName(), this.player.controller);
             alertWindow.addChild(pirateChibi, alertWindow.firstChild);
@@ -1632,7 +1717,7 @@ window.onload = function(){
             		//削除するユニットが行動後であれば
             		if(i >= this.activeUnit){
             			//行動順がずれるので、行動順の数値を修正する
-            			this.activeUnit - 1;
+            			this.activeUnit -= 1;
             		}
             	}
             }
@@ -2199,7 +2284,7 @@ window.onload = function(){
         getActivePlayer: function() {
         	//@mod 2015.0522 T.Masuda アクティブプレイヤーの選定基準を変更する
         	//行動順リストからアクティブプレイヤーのIDを取り出し、そこからプレイヤーリストを参照してアクティブプレイヤーを取得して返す
-            return this.playerList[parseInt(this.turnList[this.activeUnit]["player"].id) - 1];
+            return this.playerList[parseInt(this.turnList[this.activeUnit]["player"]) - 1];
         },
 
         //プレイヤーデータを取得する関数
@@ -2211,7 +2296,7 @@ window.onload = function(){
         getNonActivePlayer: function() {
         	//@mod 2015.0522 T.Masuda 非アクティブプレイヤーの選定基準を変更する
         	//行動順リストから非アクティブプレイヤーを取り出して返す。
-           return this.playerList[parseInt(this.turnList[this.activeUnit]["player"].id) == 1? 0 : 1];
+           return this.playerList[parseInt(this.turnList[this.activeUnit]["player"]) - 1 == 1? 0 : 1];
         },
 
         //プレイヤーの船リストを取得する関数
@@ -2272,6 +2357,9 @@ window.onload = function(){
             this.placePlayerShips(player2);
 
             this.sndManager.playBGM();
+            //ユニットの行動順番リストを作る
+            this.createTurnList();
+            //ゲームを開始する
             this.startTurn();
         },
 
@@ -2314,18 +2402,22 @@ window.onload = function(){
             this.placePlayerShips(player1);
 
             if (this.getPlayer(2) == undefined) {
-                var player2 = new AIPlayer(2, {name:"敵"});
+                var player2 = new AIPlayer(2, {name:"敵"}, this);
                 this.addPlayer(player2);
             }
 
-            if (stageId) {
-                this.setupStage(stageId);
-            } else {
-                this.setupStage(1);
-            }
+            //ステージIDがなければステージIDを1にセットする
+            stageId = stageId ? stageId: 1; 
+            //ステージIDに応じたステージをセットする
+            this.setupStage(stageId);
 
             this.sndManager.playBGM();
+            //@add 2015.0520 行動順リストを作る
+            this.createTurnList();
+            //ステージデモを開始する
+            //ゲームを始める
             this.startTurn();
+//            this.loadStageDemo(stageId , this);
         },
 
         //プレイヤーの船を配置する関数
@@ -2365,31 +2457,31 @@ window.onload = function(){
             }
         },
 
+        /*
+         * 関数名:changeBackground
+         * 引数  :int stageId:ステージの番号
+         * 戻り値:なし
+         * 概要  :ステージの背景を変える
+         * 作成日:2015.05.20
+         * 作成者:T.M
+         */
         changeBackground:function(stageId){
-        	game.currentScene.removeChild(background);
-        	// 背景
-        	var background = new Sprite(64*13, 64*9);
-        	background.image = game.assets[stageBackground[stageId - 1]];
-        	//枠の位置を考慮した座標をセットする
-        	background.x = 64;
-        	background.y = 10;
-        	
-        	game.currentScene.addChild(background);
-        	this.background = background;
+        	//背景スプライトの画像ソースを差し替える
+        	this.map.background.image = game.assets[stageBackground[stageId]];
         },
         
         //ステージ間デモを表示する
         loadStageDemo:function(stageId, gm){
         	var demoCount = 0;	//デモシーンの番号を用意する
         	//ステージデモを開始する
-        	gm.createDemoWindow(DemoData[stageId],demoCount, gm);
+        	gm.createDemoWindow(DemoData[stageId - 1],demoCount, gm);
         },
         
         //ステージデモのウィンドウを出す関数
         createDemoWindow:function(demoData, demoCount, gm){
         	//デモのウィンドウを出す
-        	var demoWindow = new AlertWindow(demoData[demoCount]["message"], this, demoData[demoCount]["portrait"]);
-        	alertWindow.onTouch = function(){
+        	var demoWindow = new DemoWindow(demoData[demoCount]["message"], this, demoData[demoCount]["portrait"]);
+        	demoWindow.onTouch = function(){
         		//次のデモデータがあれば
         		if(demoData[++demoCount] !== void(0)){
         			//次のデモウィンドウを出す
@@ -2404,10 +2496,14 @@ window.onload = function(){
         
         //ステージデータをロードしてステージ作り上げる関数
         setupStage: function(stageId) {
+            //ステージデータの参照に利用する
+            var stageIndex = (stageId-1) % StageData.length;	
         	//ステージ背景画像を入れ替える
-        	this.changeBackground(stageId);
+        	this.changeBackground(stageIndex);
         	
+        	//ゲーム管理クラスのメンバのステージIDを更新する
             this.stageId = stageId;
+            //フレームUIのデータを更新する
             this.frameUI.updateStage(stageId);
 
             var saveData = {
@@ -2423,19 +2519,30 @@ window.onload = function(){
             //セーブデータを作る
             $.jStorage.set("save data", saveData);
 
+            //CPUプレイヤーの準備を開始する。CPUプレイヤーのデータを変数に入れる
             var player2 = this.getPlayer(2);
-            var stageIndex = (stageId-1) % StageData.length;
-            var stageData = StageData[stageIndex];
+            player2.leaderLiving = true;	//CPUプレイヤーのリーダー生存フラグを立て直す
+            //ステージデータがなくなったらステージ1からやり直すため、ステージIDをステージ数で割った余りを
+            var stageData = StageData[stageIndex];	//ステージデータを取得する
+            //ループでステージデータの配置を行う
             for(var i=0; i< stageData.startPositions.length; i++) {
-                var entry = stageData.startPositions[i];
+                var entry = stageData.startPositions[i];	//敵ユニットデータをステージデータから取得する
 
+                //factoryメソッドで、ステージデータから取得した値を使ってユニットを作成する
                 var fune = this.funeFactory(entry.type);
-                fune.originX = 32;
+                //ユニットの中心のX座標を指定する
+                fune.originX = TIP_LENGTH / 2;
+                //逆向きにする
                 fune.scaleX = -1;
+                //CPUプレイヤーにユニットを与える
                 player2.addFune(fune);
+                //ユニットをマップに配置する
                 this.map.addChild(fune);
+                //ユニットの座標を指定する
                 this.map.positionFune(fune, entry.i, entry.j);
             }
+            
+            return stageIndex;	//@add 2015.0525 ステージの番号を返す
         },
 
         //ターン開始の関数
@@ -2462,7 +2569,7 @@ window.onload = function(){
         	//
             //this.map.setActiveFune(this.getActivePlayer().getActiveFune());
         	//動かすユニットを決める
-            this.map.setActiveFune(this.turnList[activeUnit]["unit"]);
+            this.map.setActiveFune(this.turnList[this.activeUnit]["unit"]);
             
             this.map.drawMovementRange();
             this.frameUI.updateTurn(this.turnCounter);
@@ -2502,16 +2609,19 @@ window.onload = function(){
                 this.turnCounter++;
                 //アクティブユニットのカウントを増やす
                 this.activeUnit++;
-                //行動順が一周したら
-                if(this.activeUnit >= turnList.length){
-                	this.activeUnit = 0;	//順番を0に戻す
-                }
-
+                //アクティブユニットの数値をチェックする
+                this.checkActiveUnitValue();
                 var playerBanner = new Sprite(512, 256);
-                if (player.id == 1) {
-                    playerBanner.image = game.assets[uiPlayerBanner2];
-                } else if (player.id == 2) {
-                    playerBanner.image = game.assets[uiPlayerBanner1];
+                
+                var NextPlayerId = this.getActivePlayer().id;	//次のプレイヤーのIDを取得する
+                //次のプレイヤーがプレイヤー1であれば
+                if (NextPlayerId == 1) {
+                	//プレイヤー1の旗を出す
+                	playerBanner.image = game.assets[uiPlayerBanner1];
+                //次のプレイヤーがプレイヤー2であれば
+                } else if (NextPlayerId == 2) {
+                	//プレイヤー2の旗を出す
+                	playerBanner.image = game.assets[uiPlayerBanner2];
                 }
 
                 playerBanner.opacity = 0;
@@ -2526,7 +2636,15 @@ window.onload = function(){
                 })
             }
         },
-
+        
+        //アクティブユニットの数値をチェックする
+        checkActiveUnitValue:function(){
+            //行動順が一周したら
+            if(this.activeUnit >= this.turnList.length){
+            	this.activeUnit = 0;	//順番を0に戻す
+            }
+        },
+        
         //対戦モードを終了する関数
         versusOver: function(winner) {
             var touchable = new ShieldWindow(this);
@@ -2594,8 +2712,14 @@ window.onload = function(){
                         self.refreshPlayer(self.getPlayer(1));
                         
                         //次のステージをセットする
-                        self.setupStage(self.stageId +1);
-                        self.loadStageDemo(self.stageId+1 , self);
+                        self.setupStage(self.stageId + 1);
+                        //行動順をリセットする
+                        self.activeUnit = 0;
+                        //ユニットの行動順番リストを作る
+                        self.createTurnList();
+                        //ステージデモを開始する
+                        self.loadStageDemo(self.stageId , self);
+
                     };
                 //敗北時の処理
                 } else if (winner.id == 2) {
@@ -2666,18 +2790,13 @@ window.onload = function(){
         //ターンの順番リストを作る関数
         createTurnList:function(){
         	var list = [];	//リスト本体となる配列を作る
-        	//for文でプレイヤーを走査する
-        	for(var i = 1; i <= this.playerList.length; i++){
-        		//プレイヤーを取得する
-        		var player = this.getPlayer[i];
-        		//ユニット一覧を取得する
-        		var unitList = player.getFuneList();
-        		//ユニット一覧を走査する
-        		for(var j = 0; j < unitList.length; j++){
-        			//順番一覧の配列にユニットのデータとユニットを所持するプレイヤーのIDをセットにして追加する
-        			list.push[{unit:unitList[j], player:player.id}];
-        		}
-        	}
+        	//ユニット一覧を取得する
+        	var unitList = this.getFuneList();
+       		//ユニット一覧を走査する
+       		for(var i = 0; i < unitList.length; i++){
+       			//順番一覧の配列にユニットのデータとユニットを所持するプレイヤーのIDをセットにして追加する
+       			list.push({unit:unitList[i], player:unitList[i].player.id});
+       		}
         	
         	//順番一覧をソートする
         	this.statusListSort(list, "speed");
@@ -2695,13 +2814,13 @@ window.onload = function(){
          */
         statusListSort:function(list, parameter){
         	// 最後の要素を除いて、すべての要素を並べ替えます
-            for(int i=0;i<list.length-1;i++){
+            for(var i=0;i<list.length-1;i++){
 
               // 下から上に順番に比較します
-              for(int j=list.length-1;j>i;j--){
+              for(var j=list.length-1;j>i;j--){
 
 	        	// 上の方が大きいときは互いに入れ替えます
-	        	if(list[j][parameter]<list[j-1][parameter]){
+	        	if(list[j]['unit']['stats'][parameter] > list[j-1]['unit']['stats'][parameter]){
 	        		//並び替える要素を別の変数に一時対比させる
 	        		var t=list[j];
 	        		//後ろの要素を前に持ってくる
@@ -2771,30 +2890,30 @@ window.onload = function(){
 
             this.turnLabel = new Label();
             scene.addChild(this.turnLabel);
-            this.turnLabel.x = 64*5;
-            this.turnLabel.y = 640 -40;
-            this.turnLabel.font = fontStyle;
+            this.turnLabel.x = TIP_LENGTH*5;
+            this.turnLabel.y = GAME_SCREEN_HEIGHT -40;
+            this.turnLabel.font = NORMAL_FONT_STYLE;
             this.turnLabel.color = fontColor;
 
             this.playerLabel = new Label();
             scene.addChild(this.playerLabel);
-            this.playerLabel.x = 64;
-            this.playerLabel.y = 640 -40;
-            this.playerLabel.font = fontStyle;
+            this.playerLabel.x = TIP_LENGTH;
+            this.playerLabel.y = GAME_SCREEN_HEIGHT -40;
+            this.playerLabel.font = NORMAL_FONT_STYLE;
             this.playerLabel.color = fontColor;
 
             this.stageLabel = new Label();
             scene.addChild(this.stageLabel);
-            this.stageLabel.x = 64*8;
-            this.stageLabel.y = 640 -40;
-            this.stageLabel.font = fontStyle;
+            this.stageLabel.x = TIP_LENGTH*8;
+            this.stageLabel.y = GAME_SCREEN_HEIGHT -40;
+            this.stageLabel.font = NORMAL_FONT_STYLE;
             this.stageLabel.color = fontColor;
 
-            this.settingsButton = new Sprite(64, 64);
+            this.settingsButton = new Sprite(TIP_LENGTH, TIP_LENGTH);
             scene.addChild(this.settingsButton);
             this.settingsButton.image = game.assets[uiSettingsSprite];
-            this.settingsButton.x = 64*14;
-            this.settingsButton.y = 640 -64;
+            this.settingsButton.x = TIP_LENGTH*14;
+            this.settingsButton.y = GAME_SCREEN_HEIGHT -TIP_LENGTH;
 
             var self = this;
             this.settingsButton.addEventListener(enchant.Event.TOUCH_START, function(params) {
@@ -2916,14 +3035,14 @@ window.onload = function(){
 
             fune.player.controller.sndManager.playFX(sndClick);
 
-            var shieldSprite = new Sprite(960, 640);
+            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
             shieldSprite.image = game.assets[ui1x1Black];
             shieldSprite.opacity = 0.5
             this.addChild(shieldSprite);
 
             var windowGroup = new Group();
-            windowGroup.x = (960 -512)/2;
-            windowGroup.y = (640 -512)/2;
+            windowGroup.x = (GAME_SCREEN_WIDTH -512)/2;
+            windowGroup.y = (GAME_SCREEN_HEIGHT -512)/2;
             this.addChild(windowGroup);
 
             var windowSprite = new Sprite(512, 512);
@@ -2931,7 +3050,7 @@ window.onload = function(){
             windowGroup.addChild(windowSprite);
 
             var statsGroup = new Group();
-            statsGroup.x = 64;
+            statsGroup.x = TIP_LENGTH;
             statsGroup.y = 32;
             windowGroup.addChild(statsGroup);
 
@@ -2942,48 +3061,48 @@ window.onload = function(){
             statsGroup.addChild(captainLabel);
             captainLabel.x = 0;
             captainLabel.y = 0;
-            captainLabel.font = fontStyle;
+            captainLabel.font = NORMAL_FONT_STYLE;
             captainLabel.color = fontColor;
 
             attackLabel = new Label("攻撃力："+fune.getAttack());
             statsGroup.addChild(attackLabel);
             attackLabel.x = 0;
-            attackLabel.y = 64 *1;
-            attackLabel.font = fontStyle;
+            attackLabel.y = TIP_LENGTH *1;
+            attackLabel.font = NORMAL_FONT_STYLE;
             attackLabel.color = fontColor;
 
             defenseLabel = new Label("防御力："+fune.getDefense());
             statsGroup.addChild(defenseLabel);
             defenseLabel.x = 0;
-            defenseLabel.y = 64 *2;
-            defenseLabel.font = fontStyle;
+            defenseLabel.y = TIP_LENGTH *2;
+            defenseLabel.font = NORMAL_FONT_STYLE;
             defenseLabel.color = fontColor;
 
             movementLabel = new Label("移動力："+fune.getMovement());
             statsGroup.addChild(movementLabel);
             movementLabel.x = 0;
-            movementLabel.y = 64 *3;
-            movementLabel.font = fontStyle;
+            movementLabel.y = TIP_LENGTH *3;
+            movementLabel.font = NORMAL_FONT_STYLE;
             movementLabel.color = fontColor;
 
             rangeLabel = new Label("攻撃の距離："+fune.getRange());
             statsGroup.addChild(rangeLabel);
             rangeLabel.x = 0;
-            rangeLabel.y = 64 *4;
-            rangeLabel.font = fontStyle;
+            rangeLabel.y = TIP_LENGTH *4;
+            rangeLabel.font = NORMAL_FONT_STYLE;
             rangeLabel.color = fontColor;
 
             hpLabel = new Label("HP："+fune.getHP()+"/"+fune.getHPMax());
             statsGroup.addChild(hpLabel);
             hpLabel.x = 0;
-            hpLabel.y = 64 *5;
-            hpLabel.font = fontStyle;
+            hpLabel.y = TIP_LENGTH *5;
+            hpLabel.font = NORMAL_FONT_STYLE;
             hpLabel.color = fontColor;
 
             //ここまでステータス
 
             //海賊の画像
-            var pirate = new Sprite(400, 640);
+            var pirate = new Sprite(400, GAME_SCREEN_HEIGHT);
             pirate.x = 350;
             pirate.y = -50;
             pirate.opacity = 0;
@@ -2992,17 +3111,17 @@ window.onload = function(){
 
             //キャンセルボタン
             var self = this;
-            var cancelBtnSprite = new Sprite(128, 64);
+            var cancelBtnSprite = new Sprite(128, TIP_LENGTH);
             cancelBtnSprite.image = game.assets[uiCancelBtnSprite];
-            cancelBtnSprite.x = 64;
-            cancelBtnSprite.y = 512 -64 -32;
+            cancelBtnSprite.x = TIP_LENGTH;
+            cancelBtnSprite.y = 512 -TIP_LENGTH -32;
             windowGroup.addChild(cancelBtnSprite);
 
             //必殺技ボタン
-            var skillBtnSprite = new Sprite(128, 64);
+            var skillBtnSprite = new Sprite(128, TIP_LENGTH);
             skillBtnSprite.image = game.assets[uiSkillBtnSprite];
-            skillBtnSprite.x = 64 *4;
-            skillBtnSprite.y = 512 -64 -32;
+            skillBtnSprite.x = TIP_LENGTH *4;
+            skillBtnSprite.y = 512 -TIP_LENGTH -32;
             windowGroup.addChild(skillBtnSprite);
 
             //必殺技使用済みなら
@@ -3066,7 +3185,7 @@ window.onload = function(){
     //ツイートボタン
     var TwitterButton = Class.create(Sprite, {
         initialize: function(options) {
-            Sprite.call(this, 64, 64);
+            Sprite.call(this, TIP_LENGTH, TIP_LENGTH);
             this.image = game.assets[uiTwitterBtnSprite];
             this.stageId = options.stageId;
             this.url     = options.url;
@@ -3087,7 +3206,7 @@ window.onload = function(){
 
             gameManager.sndManager.playFX(sndClick);		//クリック音をならす
 
-            var shieldSprite = new Sprite(960, 640);		//ベールのスプライトを作る
+            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);		//ベールのスプライトを作る
             shieldSprite.image = game.assets[ui1x1Black];	//黒背景画像をセットする
             shieldSprite.opacity = 0.5						//半透過する
             this.addChild(shieldSprite);					//シーンに追加する
@@ -3109,43 +3228,35 @@ window.onload = function(){
     //お知らせメッセージウィンドウ
     var AlertWindow = Class.create(Scene, {
     	//コンストラクタ
-        initialize: function(message, gameManager, image) {
-            Scene.call(this);
+        initialize: function(message, gameManager) {
+        	Scene.call(this);
             game.pushScene(this);
 
-            var shieldSprite = new Sprite(960, 640);
+            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
             shieldSprite.image = game.assets[ui1x1Black];
             shieldSprite.opacity = 0.2
             this.addChild(shieldSprite);
 
             var windowSprite = new Sprite(320, 160);
             windowSprite.image = game.assets[uiAlertScreen];
-            windowSprite.x = (960 -320)/2;
-            windowSprite.y = (640 -160)/2;
+            windowSprite.x = (GAME_SCREEN_WIDTH -320)/2;
+            windowSprite.y = (GAME_SCREEN_HEIGHT -160)/2;
             this.addChild(windowSprite);
+            //@add 2015.0525 クラスオブジェクトにウィンドウへの参照を持たせました
+            this.windowSprite = windowSprite;
 
+            
             var fontColor = "rgba(255, 255, 105, 1.0)";
 
             messageLabel = new Label(message);
             this.addChild(messageLabel);
             messageLabel.x = windowSprite.x +40;
-            messageLabel.y = windowSprite.y +64;
-            messageLabel.font = fontStyle;
+            messageLabel.y = windowSprite.y +TIP_LENGTH;
+            messageLabel.font = NORMAL_FONT_STYLE;
             messageLabel.color = fontColor;
+            //@add 2015.0525 クラスオブジェクトにラベルへの参照を持たせました
+            this.messageLabel = messageLabel;
             
-            //画像パスが第3引数にセットされていれば
-            if(image !== void(0)){
-            	//顔写真のスプライトを作る
-            	var faceImage = new Sprite(100, 100);
-            	//画像をセットする
-            	faceImage.image = assets[image];
-            	//ウィンドウにスプライトを追加する
-            	this.addChild(faceImage);
-            	//座標をセットする
-            	faceImage.x = windowSprite.x;
-            	faceImage.y = windowSprite.y;
-            }
-
             var once = false;
             var self = this;
 
@@ -3166,9 +3277,64 @@ window.onload = function(){
                     }
                 });
             });
-        },
+        }
     })
 
+    /*
+     * 関数名:isSupportPushState()
+     * 引数  :String message:ウィンドウに表示するメッセージ
+     * 		:GameManager gameManager:ゲーム進行管理クラスのインスタンス
+     * 		:String image:ウィンドウに表示する画像パス
+     * 概要  :ステージデモウィンドウクラス。お知らせウィンドウのクラスを継承する
+     * 作成日:2015.05.25
+     * 作成者:T.M
+     */
+    var DemoWindow = Class.create(AlertWindow, {
+    	//コンストラクタ
+        initialize: function(message, gameManager, image) {
+        	//お知らせウィンドウのコンストラクタを実行する
+        	AlertWindow.call(this, message,gameManager);
+        	//デモウィンドウ用のフォントを指定する
+        	this.messageLabel.font = DEMO_FONT_STYLE;
+
+            //画像パスが第3引数にセットされていれば
+            if(image !== void(0) && image != ''){
+            	//顔写真のスプライトを作る
+            	var faceImage = new Sprite(100, 100);
+            	//画像をセットする
+            	faceImage.image = game.assets[image];
+            	//ウィンドウにスプライトを追加する
+            	this.addChild(faceImage);
+            	//座標をセットする
+            	faceImage.x = this.windowSprite.x + WINDOW_MARGIN / 2;
+            	faceImage.y = this.windowSprite.y + WINDOW_MARGIN;
+            }
+        	
+        	//表示するラベルのテキストを取得する
+        	var text = this.messageLabel.text;
+        	//本来のラベルを消す
+        	this.removeChild(this.messageLabel);
+        	
+        	//フォントの色を設定する
+        	var fontColor = "rgba(255, 255, 105, 1.0)";
+        	//ループでラベルを作成する
+        	for(var i = 0; text.length > 0; i++){
+        		//新たなラベルを生成する
+        		var label = new Label();
+        		this.addChild(label);	//ラベルをウィンドウに追加する
+        		//テキストを1行分切り出してセットする
+        		label.text = text.substr(0, MESSAGE_NUMBER_PER_LINE);
+        		//切り出した残りを自らにセットする
+        		text = text.substr(MESSAGE_NUMBER_PER_LINE);
+        		label.font = DEMO_FONT_STYLE;	//このウィンドウ用のフォントをセットする
+        		label.color = fontColor;		//フォントの色をセットする
+        		//ラベルの座標をセットする
+        		label.x = this.windowSprite.x + WINDOW_MARGIN + faceImage.width;
+        		label.y = this.windowSprite.y + (DEMOWINDOW_LABEL_HEIGHT * (i + 1));
+        	}
+        }
+    });
+    
     /**
      * 設定ウィンドウ
      */
@@ -3179,14 +3345,14 @@ window.onload = function(){
 
             gameManager.sndManager.playFX(sndClick);
 
-            var shieldSprite = new Sprite(960, 640);
+            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
             shieldSprite.image = game.assets[ui1x1Black];
             shieldSprite.opacity = 0.5
             this.addChild(shieldSprite);
 
             var windowGroup = new Group();
-            windowGroup.x = (960 -512)/2;
-            windowGroup.y = (640 -512)/2;
+            windowGroup.x = (GAME_SCREEN_WIDTH -512)/2;
+            windowGroup.y = (GAME_SCREEN_HEIGHT -512)/2;
             this.addChild(windowGroup);
 
             var windowSprite = new Sprite(512, 512);
@@ -3194,7 +3360,7 @@ window.onload = function(){
             windowGroup.addChild(windowSprite);
 
             var settingsGroup = new Group();
-            settingsGroup.x = 64;
+            settingsGroup.x = TIP_LENGTH;
             settingsGroup.y = 32;
             windowGroup.addChild(settingsGroup);
 
@@ -3204,12 +3370,12 @@ window.onload = function(){
             settingsGroup.addChild(soundLabel);
             soundLabel.x = 0;
             soundLabel.y = 16;
-            soundLabel.font = fontStyle;
+            soundLabel.font = NORMAL_FONT_STYLE;
             soundLabel.color = fontColor;
 
-            var sndUpButton = new Sprite(64, 64);
+            var sndUpButton = new Sprite(TIP_LENGTH, TIP_LENGTH);
             settingsGroup.addChild(sndUpButton);
-            sndUpButton.x = 64 *4;
+            sndUpButton.x = TIP_LENGTH *4;
             sndUpButton.y = 0;
             sndUpButton.image = game.assets[uiArrowSprite];
 
@@ -3234,9 +3400,9 @@ window.onload = function(){
                 }
             });
 
-            var sndDownButton = new Sprite(64, 64);
+            var sndDownButton = new Sprite(TIP_LENGTH, TIP_LENGTH);
             settingsGroup.addChild(sndDownButton);
-            sndDownButton.x = 64*5 +5;
+            sndDownButton.x = TIP_LENGTH*5 +5;
             sndDownButton.y = 0;
             sndDownButton.rotation = 180;
             sndDownButton.image = game.assets[uiArrowSprite];
@@ -3262,10 +3428,10 @@ window.onload = function(){
             });
 
             var self = this;
-            var cancelBtnSprite = new Sprite(128, 64);
+            var cancelBtnSprite = new Sprite(128, TIP_LENGTH);
             cancelBtnSprite.image = game.assets[uiCancelBtnSprite];
-            cancelBtnSprite.x = 64;
-            cancelBtnSprite.y = 512 -64 -32;
+            cancelBtnSprite.x = TIP_LENGTH;
+            cancelBtnSprite.y = 512 -TIP_LENGTH -32;
 
             windowGroup.addChild(cancelBtnSprite);
 
@@ -3299,14 +3465,14 @@ window.onload = function(){
             Scene.call(this);
             game.pushScene(this);
 
-            var shieldSprite = new Sprite(960, 640);
+            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
             shieldSprite.image = game.assets[ui1x1Black];
             shieldSprite.opacity = 0.5
             this.addChild(shieldSprite);
 
             var windowGroup = new Group();
-            windowGroup.x = (960 -512)/2;
-            windowGroup.y = (640 -512)/2;
+            windowGroup.x = (GAME_SCREEN_WIDTH -512)/2;
+            windowGroup.y = (GAME_SCREEN_HEIGHT -512)/2;
             this.addChild(windowGroup);
 
             var windowSprite = new Sprite(512, 512);
@@ -3314,16 +3480,16 @@ window.onload = function(){
             windowGroup.addChild(windowSprite);
 
             var self = this;
-            var versusBtnSprite = new Sprite(128, 64);
+            var versusBtnSprite = new Sprite(128, TIP_LENGTH);
             versusBtnSprite.image = game.assets[uiVersusBtnSprite];
-            versusBtnSprite.x = 64 *1.5;
-            versusBtnSprite.y = 512 -64 -32;
+            versusBtnSprite.x = TIP_LENGTH *1.5;
+            versusBtnSprite.y = 512 -TIP_LENGTH -32;
             windowGroup.addChild(versusBtnSprite);
 
-            var campaignBtnSprite = new Sprite(128, 64);
+            var campaignBtnSprite = new Sprite(128, TIP_LENGTH);
             campaignBtnSprite.image = game.assets[uiStoryBtnSprite];
-            campaignBtnSprite.x = 64 *4.5;
-            campaignBtnSprite.y = 512 -64 -32;
+            campaignBtnSprite.x = TIP_LENGTH *4.5;
+            campaignBtnSprite.y = 512 -TIP_LENGTH -32;
             windowGroup.addChild(campaignBtnSprite);
 
             windowGroup.originX = 256;
@@ -3366,14 +3532,14 @@ window.onload = function(){
             Scene.call(this);
             game.pushScene(this);
 
-            var shieldSprite = new Sprite(960, 640);
+            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
             shieldSprite.image = game.assets[ui1x1Black];
             shieldSprite.opacity = 0.5
             this.addChild(shieldSprite);
 
             var windowGroup = new Group();
-            windowGroup.x = (960 -512)/2;
-            windowGroup.y = (640 -512)/2;
+            windowGroup.x = (GAME_SCREEN_WIDTH -512)/2;
+            windowGroup.y = (GAME_SCREEN_HEIGHT -512)/2;
             this.addChild(windowGroup);
 
             var windowSprite = new Sprite(512, 512);
@@ -3385,10 +3551,10 @@ window.onload = function(){
             var saveData = $.jStorage.get("save data");
             if (saveData) {
                 console.log("Found Save Data", saveData.stageId)
-                var continueBtnSprite = new Sprite(128, 64);
+                var continueBtnSprite = new Sprite(128, TIP_LENGTH);
                 continueBtnSprite.image = game.assets[uiContinueBtnSprite];
-                continueBtnSprite.x = 64 *1.5;
-                continueBtnSprite.y = 512 -64 -32;
+                continueBtnSprite.x = TIP_LENGTH *1.5;
+                continueBtnSprite.y = 512 -TIP_LENGTH -32;
                 windowGroup.addChild(continueBtnSprite);
 
                 continueBtnSprite.addEventListener(enchant.Event.TOUCH_START, function(params) {
@@ -3402,14 +3568,16 @@ window.onload = function(){
                         gameManager.beginCampaignGame();
                         gameManager.sndManager.playFX(sndClick);
                         game.popScene();
+                        //@add 2015.0525 ゲーム開始時にデモをコールする関数を追加しました。
+                        gameManager.loadStageDemo(gameManager.stageId , gameManager);
                     });
                 });
             }
 
-            var newBtnSprite = new Sprite(128, 64);
+            var newBtnSprite = new Sprite(128, TIP_LENGTH);
             newBtnSprite.image = game.assets[uiNewBtnSprite];
-            newBtnSprite.x = 64 *4.5;
-            newBtnSprite.y = 512 -64 -32;
+            newBtnSprite.x = TIP_LENGTH *4.5;
+            newBtnSprite.y = 512 -TIP_LENGTH -32;
             windowGroup.addChild(newBtnSprite);
 
             windowGroup.originX = 256;
@@ -3427,6 +3595,8 @@ window.onload = function(){
                     gameManager.beginCampaignGame();
                     gameManager.sndManager.playFX(sndClick);
                     game.popScene();
+                    //@add 2015.0525 ゲーム開始時にデモをコールする関数を追加しました。
+                    gameManager.loadStageDemo(gameManager.stageId , gameManager);
                 });
             });
         },
@@ -3438,14 +3608,14 @@ window.onload = function(){
             Scene.call(this);
             game.pushScene(this);
 
-            var shieldSprite = new Sprite(960, 640);
+            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
             shieldSprite.image = game.assets[ui1x1Black];
             shieldSprite.opacity = 0.5
             this.addChild(shieldSprite);
 
             var windowGroup = new Group();
-            windowGroup.x = (960 -512)/2;
-            windowGroup.y = (640 -512)/2;
+            windowGroup.x = (GAME_SCREEN_WIDTH -512)/2;
+            windowGroup.y = (GAME_SCREEN_HEIGHT -512)/2;
             this.addChild(windowGroup);
 
             var windowSprite = new Sprite(512, 512);
@@ -3454,10 +3624,10 @@ window.onload = function(){
 
             var self = this;
 
-            var humanBtnSprite = new Sprite(128, 64);
+            var humanBtnSprite = new Sprite(128, TIP_LENGTH);
             humanBtnSprite.image = game.assets[uiHumanBtnSprite];
-            humanBtnSprite.x = 64 *1.5;
-            humanBtnSprite.y = 512 -64 -32;
+            humanBtnSprite.x = TIP_LENGTH *1.5;
+            humanBtnSprite.y = 512 -TIP_LENGTH -32;
             windowGroup.addChild(humanBtnSprite);
 
             windowGroup.originX = 256;
@@ -3477,10 +3647,10 @@ window.onload = function(){
                 });
             });
 
-            var cpuBtnSprite = new Sprite(128, 64);
+            var cpuBtnSprite = new Sprite(128, TIP_LENGTH);
             cpuBtnSprite.image = game.assets[uiCpuBtnSprite];
-            cpuBtnSprite.x = 64 *4.5;
-            cpuBtnSprite.y = 512 -64 -32;
+            cpuBtnSprite.x = TIP_LENGTH *4.5;
+            cpuBtnSprite.y = 512 -TIP_LENGTH -32;
             windowGroup.addChild(cpuBtnSprite);
 
             windowGroup.originX = 256;
@@ -3523,7 +3693,7 @@ window.onload = function(){
             [0, 0, 0, 3, 3, 3, 2, 0, 0, 2, 2, 3, 3],
         ];
 
-        var map = new GameMap(sceneGameMain, mapDisplayData);
+        var map = new GameMap(sceneGameMain, mapDisplayData, manager);
         manager.setMap(map);
 
         var frameUI = new FrameUI(sceneGameMain);
