@@ -18,7 +18,9 @@ GAME_SCREEN_HEIGHT = 640;
 
 //マス目の1辺の長さ
 TIP_LENGTH = 64;
-	
+//縦長のキャラのサイズ
+HIGH_TIP_HEIGHT = 96;
+
 //ユニットの行動順番を表示する領域の座標の定数2つ
 UNITTURN_X = TIP_LENGTH * 10;
 UNITTURN_Y = TIP_LENGTH * 8;
@@ -30,6 +32,14 @@ FRAME_RATE = 30;
 WAITING_UNIT_OPACITY = 0.5;
 //行動順リストの背景の透過度
 TURNBACK_OPACITY = 0.75;
+
+//画像倍率合わせ用の定数
+//ドイツ兵画像
+DEUTSCH_SCALE = 64/24;
+
+//画像幅の定数
+//ドイツ兵画像
+DEUTSCH_WIDTH = 24; DEUTSCH_HEIGHT = 32;
 
 //フォント設定
 //フォントの設定データを作成する
@@ -227,6 +237,10 @@ window.onload = function(){
     var uiLose            = "resources/lose.png";
     game.preload(uiLose);
 
+    //ドイツ兵のキャラチップ(スプライトシート)
+    var deustchSoldier = "resources/deutschSoldier.png";
+    game.preload(deustchSoldier);
+    
     /**
      * 音関連のデータをプリロードする
      */
@@ -1012,7 +1026,9 @@ window.onload = function(){
             var fune = new Sprite(TIP_LENGTH, TIP_LENGTH);	//スプライトを作成する
             this.fune = fune;				//自身の参照を持たせる
             fune.image = game.assets[shipsSpriteSheet];	//画像をセットする
+            
             //アニメーション用のフレームをセットする
+            fune.frame = [0, 0, 0, 0, 1, 1, 1, 2, 2, 1, 1, 0, 0, 0, 0, 3, 3, 3];
             fune.frame = [0, 0, 0, 0, 1, 1, 1, 2, 2, 1, 1, 0, 0, 0, 0, 3, 3, 3];
             fune.sinkFrame = [3, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, null];
             
@@ -1323,8 +1339,7 @@ window.onload = function(){
                 hpMax:   120,
                 speed:	5
             });
-            
-            
+           	//アニメ設定           
             this.fune.frame = [0, 0, 0, 0, 1, 1, 1, 2, 2, 1, 1, 0, 0, 0, 0, 3, 3, 3];
             this.fune.sinkFrame = [3, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, null];
         },
@@ -1366,6 +1381,74 @@ window.onload = function(){
 
     });
 
+    //ドイツ兵
+    var deutschSoldier = Class.create(BaseFune, {
+    	initialize: function(id) {
+    		BaseFune.call(this, id, {
+    			movement:  4,
+    			range:     3,
+    			attack:  100,
+    			defense:  50,
+    			hpMax:   120,
+    			speed:	5
+    		});
+
+    		//画像幅の定数
+    		//ドイツ兵画像
+    		DEUTSCH_WIDTH = 24; DEUTSCH_HEIGHT = 32;
+    		
+    		//高さを変更する
+    		this.fune.height = DEUTSCH_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = DEUTSCH_WIDTH;
+    		//画像が小さめなので拡大倍率を指定する
+    		this.fune.scaleX = DEUTSCH_SCALE;
+    		this.fune.scaleY = DEUTSCH_SCALE;
+    		
+    		//ドイツ兵のスプライトシートを使う
+    		this.fune.image = game.assets[deustchSoldier]; 
+    		//アニメ設定           
+    		this.fune.frame = [10, 10, 10, 9, 9, 9, 11, 11, 11, 9, 9];
+    		this.fune.sinkFrame = [12, 12, null, null, 12, 12, null, null, 12, 12, null, null];
+    	},
+    	
+    	getCaptainName: function() {
+    		return "ドイツ兵";
+    	},
+    	
+    	getSkillName: function() {
+    		return "応急手当";
+    	},
+    	
+    	processSkill: function(onEnd) {
+    		var count = this.player.getFuneCount();
+    		for(var i=0; i < count; i++) {
+    			var fune = this.player.getFune(i);
+    			var toHeal = Math.ceil(fune.getHPMax() /2);
+    			fune.healDamage(toHeal);
+    		}
+    		onEnd();
+    	},
+    	
+    	//やられ処理の関数を上書きする
+    	sinkShip: function() {
+    		this.player.controller.sndManager.playFX(sndSinkShip);
+    		//隊長の生存フラグを下ろし、ターン終了の関数で負けにする
+    		//this.player.leaderLiving = false;
+    		
+    		this.player.removeFune(this);
+    		this.counter = 1;
+    		this.fune.frame = this.fune.sinkFrame;
+    		this.onenterframe = function(){ // enterframe event listener
+    			            this.counter++;
+    			if (this.counter == 12 ) {
+    				this.parentNode.removeChild(this);
+    			}
+    			    };
+    	}
+    	
+    });
+    
     //速い船
     var HayaiFune = Class.create(BaseFune, {
         initialize: function(id) {
@@ -2386,7 +2469,9 @@ window.onload = function(){
             } else {
                 // プレイヤー1に船を４つあげよう
                 player1.addFune(new CaptainFune(1));
-                player1.addFune(new HayaiFune(2));
+                //@mod 2015.0526 T.Masuda 試験的にドイツ兵を追加 
+//                player1.addFune(new HayaiFune(2));
+                player1.addFune(new deutschSoldier(11));
                 player1.addFune(new KataiFune(3));
                 player1.addFune(new KougekiFune(4));
             }
@@ -2877,6 +2962,9 @@ window.onload = function(){
                 case 10:
                 case "kougeki_teki":
                 	return new KougekiTeki(10);
+                case 11:
+                case "deutschSoldier":
+                	return new deutschSoldier(11);
             }
         },
     })
@@ -3125,7 +3213,8 @@ window.onload = function(){
             windowGroup.addChild(skillBtnSprite);
 
             //必殺技使用済みなら
-            if (fune.usedSkill) {
+            //@mod 2015.0525 T.Masuda アクティブではないユニットのステータスウィンドウならスキルを発動できない色にするよう変更しました
+            if (fune.usedSkill ||fune == fune.player.getActiveFune()) {
             	//必殺技ボタンを半透明にして使用済みの表現を行う
                 skillBtnSprite.opacity = 0.5;
             }
