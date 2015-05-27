@@ -8,9 +8,27 @@ enchant();
 //定数を宣言する
 RECOVER_HP = 0.5;	//ステージ終了後の回復倍率
 //アニメーションのフレームの配列を宣言する
-TO_UP_FRAME = [2,2,2,3,3,3,2,2,2,3,3,3];
-TO_LOW_FRAME = [4,4,4,5,5,5,4,4,4,5,5,5];
-TO_SIDE_FRAME = [0,0,0,1,1,1,0,0,0,1,1,1];
+TO_UP_FRAME = {
+		player01:[12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15]
+//    	player02:[57 , 57, 57, 57, 57, 57, 58, 58, 58, 58, 58, 58, 59, 59, 59, 59, 59, 59, 58, 58, 58, 58, 58, 58]
+};
+TO_LOW_FRAME = {
+		player01:[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3]
+//		player02:[81 , 81, 81, 81, 81, 81, 82, 82, 82, 82, 82, 82, 83, 83, 83, 83, 83, 83, 82, 82, 82, 82, 82, 82]
+};
+TO_SIDE_FRAME = {
+		player01:[8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11]
+//		player02:[69 , 69, 69, 69, 69, 69, 70, 70, 70, 70, 70, 70, 71, 71, 71, 71, 71, 71, 70, 70, 70, 70, 70, 70]
+};
+
+//ユニットやられ時のフレーム
+SINK_FRAME = {
+		player01:[12, 12, null, null, 12, 12, null, null, 12, 12, null, null]
+//		player02:[60, 60, null, null, 60, 60, null, null, 60, 60, null, null]
+};
+
+//デフォルトプレイヤー名
+PLAYER01 = 'player01';
 
 //ゲーム画面の高さと幅の定数を作成する
 GAME_SCREEN_WIDTH = 960;
@@ -18,8 +36,12 @@ GAME_SCREEN_HEIGHT = 640;
 
 //マス目の1辺の長さ
 TIP_LENGTH = 64;
-//縦長のキャラのサイズ
-HIGH_TIP_HEIGHT = 96;
+//@add 2015.0527 T.Masuda キャラの画像の高さ。幅は共通の値
+HIGH_TIP_HEIGHT = 98;
+
+character_SPRITE_HEIGHT = 393 / 4;
+
+
 
 //ユニットの行動順番を表示する領域の座標の定数2つ
 UNITTURN_X = TIP_LENGTH * 10;
@@ -33,25 +55,33 @@ WAITING_UNIT_OPACITY = 0.5;
 //行動順リストの背景の透過度
 TURNBACK_OPACITY = 0.75;
 
-//画像倍率合わせ用の定数
-//ドイツ兵画像
-DEUTSCH_SCALE = 64/24;
+//ラベルボタン関連の定数
+CANCEL_LABEL = "キャンセル";	//キャンセルボタン用のテキスト
+MOVE_CONFIRM_LABEL = "待機";	//待機ボタン用のテキスト
+BUTTON_WIDTH = 100;	//ボタンの幅
 
-//画像幅の定数
-//ドイツ兵画像
-DEUTSCH_WIDTH = 24; DEUTSCH_HEIGHT = 32;
 
 //フォント設定
 //フォントの設定データを作成する
 NORMAL_FONT_STYLE = "32px 'ＭＳ ゴシック', arial, sans-serif";
 //ステージデモのフォントを作成する
 DEMO_FONT_STYLE = "24px 'ＭＳ Pゴシック', arial, sans-serif";
+//ステージデモのフォントを作成する
+MOVE_BUTTON_FONT_STYLE = "20px 'ＭＳ Pゴシック', arial, sans-serif";
+//黄色のフォントカラー
+FONT_YELLOW = "rgba(255, 255, 105, 1.0)";
+//白抜き文字
+FONT_WHITE = "rgba(255, 255, 255, 1.0)";
+
+
 //ステージデモのメッセージ1行の文字数
 MESSAGE_NUMBER_PER_LINE = 7;
 //ステージデモのメッセージ1行分の高さ
 DEMOWINDOW_LABEL_HEIGHT = 30;
 //ウィンドウのマージン
 WINDOW_MARGIN = 40;
+//メッセージウィンドウの顔グラフィックのサイズ
+FACE_IMAGE_SIZE = 100;
 
 //ウィンドウロード時のイベント
 window.onload = function(){
@@ -64,7 +94,8 @@ window.onload = function(){
      * 必要なファイルを相対パスで引数に指定する。 ファイルはすべて、ゲームが始まる前にロードされる。
      */
     //マップの枠の画像パスを取得する
-    var mapFrame  = "resources/mapframe.png";
+    //@mod 2015.0527 T.Masuda 画像を差し替えました。 木テーブルと地図 → 鉄格子状壁 
+    var mapFrame  = "resources/ui/frame_metaltile.jpg";
     game.preload(mapFrame);	//マップ画像をプリロードする。
     //以下同様に画像をプリロードしていく
     
@@ -237,25 +268,45 @@ window.onload = function(){
     var uiLose            = "resources/lose.png";
     game.preload(uiLose);
 
-    //ドイツ兵のキャラチップ(スプライトシート)
-    var deustchSoldier = "resources/deutschSoldier.png";
-    game.preload(deustchSoldier);
+    //プレイヤー01兵のキャラチップ(スプライトシート)
+    var player01 = "resources/character/player01.png";
+    game.preload(player01);
+    //プレイヤー02兵のキャラチップ(スプライトシート)
+    var player02 = "resources/character/player02.png";
+    game.preload(player02);
+    //エネミー01兵のキャラチップ(スプライトシート)
+    var enemy01 = "resources/character/enemy01.png";
+    game.preload(enemy01);
+    //エネミー02兵のキャラチップ(スプライトシート)
+    var enemy02 = "resources/character/enemy02.png";
+    game.preload(enemy02);
+    //エネミー03兵のキャラチップ(スプライトシート)
+    var enemy03 = "resources/character/enemy03.png";
+    game.preload(enemy03);
     
     /**
      * 音関連のデータをプリロードする
      */
     //BGM
-    var sndBGM            = "resources/music/highseas.mp3";
+//    var sndBGM            = "resources/music/highseas.mp3";
+//    game.preload(sndBGM);
+    
+    //BGMその2
+    var sndBGM            = "resources/music/openfire.mp3";
     game.preload(sndBGM);
 
     //クリック音
-    var sndClick          = "resources/sound/se2.wav";
+    var sndClick          = "resources/sound/select.wav";
     game.preload(sndClick);
 
     //爆発音
     var sndExplosion      = "resources/sound/shot2.wav";
     game.preload(sndExplosion);
 
+    //射撃音
+    var sndShot      = "resources/sound/shot.wav";
+    game.preload(sndShot);
+    
     //船の沈没音
     var sndSinkShip       = "resources/sound/bomb4.wav";
     game.preload(sndSinkShip);
@@ -370,7 +421,7 @@ window.onload = function(){
             //マップデータをロードする
             tiles.loadData(mapData);
             //透明にする
-            tiles.opacity = 0.;
+            tiles.opacity = 1;
             scene.addChild(tiles);
             this.tiles = tiles;
 
@@ -563,6 +614,13 @@ window.onload = function(){
             //マス目の座標をオブジェクトに登録する
             object.i = i;
             object.j = j;
+            
+            //@add 2015.0526 T.Masuda スプライトの縦サイズの違いへの対応のためのコードを追加しました
+            //オブジェクトにY座標補正用のメンバがあれば
+            if('replaceY' in object){
+            	//Y座標から補正値を引く
+            	object.y -= object.replaceY;
+            }
         },
 
         //船の座標をセットする関数
@@ -575,20 +633,28 @@ window.onload = function(){
         changeDirection:function(fune, i, j){
         	var unit = fune.fune;		//ユニットのデータを変数に入れる
         	//前のマスの座標を得る
-        	var beforeI = unit.i;
-        	var beforeJ = unit.j;
+        	var beforeI = unit.parentNode.i;
+        	var beforeJ = unit.parentNode.j;
         	
+        	//@mod 2015.05.27 T.Masuda ユニットの歩行アニメ素材の形式が統一されているので
+        	//全てのユニットで同じフレームを設定するようにしました。
         	//上に進むなら
-        	if(beforeI < i){
-        		unit.frame = TO_UP_FRAME;	//ユニットのアニメのフレームを上向きのものにする
+        	if(beforeJ > j){
+        		//@mod 2015.0526 T.Masuda フレームをユニット毎に用意するように変更したため、
+        		//ユニット名でフレームリストを取得するように変更しました
+        		unit.frame = TO_UP_FRAME[PLAYER01];	//ユニットのアニメのフレームを上向きのものにする
         	//下に進むなら
-        	} else if(beforeI < i){
-        		unit.frame = TO_UP_FRAME;	//ユニットのアニメのフレームを上向きのものにする
+        	} else if(beforeJ < j){
+        		//@mod 2015.0526 T.Masuda フレームをユニット毎に用意するように変更したため、
+        		//ユニット名でフレームリストを取得するように変更しました
+        		unit.frame = TO_LOW_FRAME[PLAYER01];	//ユニットのアニメのフレームを下向きのものにする
         	//左右に進むなら
         	} else {
-        		unit.frame = TO_SIDE_FRAME;	//ユニットのアニメのフレームを上向きのものにする
+        		//@mod 2015.0526 T.Masuda フレームをユニット毎に用意するように変更したため、
+        		//ユニット名でフレームリストを取得するように変更しました
+        		unit.frame = TO_SIDE_FRAME[PLAYER01];	//ユニットのアニメのフレームを上向きのものにする
         		//右に進むなら
-        		if(beforeJ > j){
+        		if(beforeJ > i){
         			//ユニットを逆の方向に向ける
         			unit.scaleX = -1;
         		} else {
@@ -749,24 +815,158 @@ window.onload = function(){
                 }
                 //異動先のマス目のログを出す
                 console.log("i", tile.i, "j", tile.j, "distance", this.getManhattanDistance(this.activeFune.i, this.activeFune.j, tile.i, tile.j));
-
+                //@mod 2015.0526 T.Masuda this.activeFuneへの参照が多いため、変数を使います
+                var activeFune = this.activeFune;
                 //マンハッタン距離で移動可能な場所であれば
-                if (this.getManhattanDistance(this.activeFune.i, this.activeFune.j, tile.i, tile.j) <= this.activeFune.getMovement()) {
+                if (this.getManhattanDistance(activeFune.i, activeFune.j, tile.i, tile.j) <= activeFune.getMovement()) {
                     //進路データを取得する
-                	var path = this.getPath(this.activeFune, this.activeFune.i, this.activeFune.j, tile.i, tile.j);
+                	var path = this.getPath(activeFune, activeFune.i, activeFune.j, tile.i, tile.j);
                     //進路のコストが船の移動力に収まれば移動処理を開始する
-                	if (path.cost <= this.activeFune.getMovement()) {
+                	if (path.cost <= activeFune.getMovement()) {
                         var self = this;		//GameMapへの参照を変数に格納する
+                        //@add 2015.0526 T.Masuda 座標を一時保存するようにしました
+                        activeFune.prevX = activeFune.i;
+                        activeFune.prevY = activeFune.j;
+                        //ここまで追加しました。
                         utils.beginUIShield();	//一時的に操作不能にする
                         //船を動かす
                         self.moveFune(self.activeFune, path, function() {
-                            self.controller.endTurn();	//移動を終えたらターンを終了する
+                        	//@mod 2015.0526 T.Masuda endTurn関数を削除し移動後のターン終了をしないようにしました
+                            //self.controller.endTurn();	//移動を終えたらターンを終了する
+                            //@add 2015.0526 T.Masuda afterMove関数をコールして移動後に待機状態になるようにしました
+                            self.afterMove(self);	//移動後待機状態にする
                         });
                     }
                 }
             }
         },
+        
+        /*
+         * 関数名:createMoveCancelButton
+         * 引数  :GameMap gameMap:ゲームのマップ
+         * 戻り値:Label:移動キャンセルボタンを返す
+         * 概要  :移動キャンセルのラベルボタンを作る
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+        createMoveCancelButton:function(gameMap){
+        	//移動後のキャンセルボタンを作る
+        	var moveCancelButton = new Label(CANCEL_LABEL);
+        	//キャンセルボタンに高さを指定する
+        	moveCancelButton.height = TIP_LENGTH;
+        	//キャンセルボタンに幅を指定する
+        	moveCancelButton.width = BUTTON_WIDTH;
+        	//キャンセルボタンを画面に追加する
+        	gameMap.scene.addChild(moveCancelButton);
+        	//ゲームマップにキャンセルボタンへの参照を登録する
+        	gameMap.moveCancelButton = moveCancelButton;
+        	//フォントを設定する
+        	moveCancelButton.font = MOVE_BUTTON_FONT_STYLE;
+        	moveCancelButton.color = FONT_WHITE;
+        	
+        	return moveCancelButton;	//作成したボタンを返す
+        },
+        
+        /*
+         * 関数名:createMoveConfirmButton
+         * 引数  :GameMap gameMap:ゲームのマップ
+         * 戻り値:Label:待機のラベルボタンをを返す
+         * 概要  :待機のラベルボタンを作る
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+        createMoveConfirmButton:function(gameMap){
+        	//移動後のキャンセルボタンを作る
+        	var moveConfirmButton = new Label(MOVE_CONFIRM_LABEL);
+        	//待機ボタンに高さを指定する
+        	moveConfirmButton.height = TIP_LENGTH;
+        	//待機ボタンに幅を指定する
+        	moveConfirmButton.width = BUTTON_WIDTH;
+        	//待待機ボタンを画面に追加する
+        	gameMap.scene.addChild(moveConfirmButton);
+        	//ゲームマップに待機ボタンへの参照を登録する
+        	gameMap.moveConfirmButton = moveConfirmButton;
+        	//フォントの色を設定する
+        	moveConfirmButton.font = MOVE_BUTTON_FONT_STYLE;
+        	moveConfirmButton.color = FONT_WHITE;
 
+        	return moveConfirmButton;	//作成したボタンを返す
+        },
+        
+        /*
+         * 関数名:removeMoveButtons
+         * 引数  :GameMap gameMap:ゲームのマップ
+         * 概要  :待機ボタン、キャンセルボタンを消す
+         * 戻り値:なし
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+        removeMoveButtons:function(gameMap){
+        	//待機、キャンセルボタンがあれば
+        	if('moveCancelButton' in gameMap||'moveConfirmButton' in gameMap){
+    		//キャンセルボタン、待機ボタンを削除する
+    		gameMap.scene.removeChild(gameMap.moveCancelButton);
+    		gameMap.scene.removeChild(gameMap.moveConfirmButton);
+    		//ゲームマップに保存した参照も削除する
+    		gameMap.moveCancelButton = null;
+    		gameMap.moveConfirmButton = null;
+        	}
+        },
+        
+        /*
+         * 関数名:afterMove
+         * 引数  :GameMap gameMap:ゲームのマップ
+         * 概要  :移動後の待機状態を整える
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+        afterMove:function(gameMap){
+        	//アクティブなユニットを取得する
+        	var unit = gameMap.activeFune;
+        	//移動を終えたユニットの移動力を一時的に0にする
+        	unit.stats.movement = 0;
+    		//ユニットの座標を確定させる
+            gameMap.positonObject(unit, unit.i, unit.j);
+        	//移動後のキャンセルボタンを作る
+        	var moveCancelButton = gameMap.createMoveCancelButton(gameMap);
+        	//移動後の待機ボタンを作る
+        	var moveConfirmButton = gameMap.createMoveConfirmButton(gameMap);
+        	
+        	//ユニットの上に待機ボタンとキャンセルボタンを配置する
+        	moveCancelButton.x = unit.x;
+        	moveCancelButton.y = unit.y - TIP_LENGTH / 3;
+        	moveConfirmButton.x = unit.x; 
+        	moveConfirmButton.y = unit.y - TIP_LENGTH * 2  / 3;
+        	
+        	//キャンセルボタンのイベントを登録する
+        	moveCancelButton.ontouchend = function(){
+        		//ユニットを前の座標に戻す
+                gameMap.positonObject(unit, unit.prevX, unit.prevY);
+        		
+        		//ユニットの移動力を戻す
+        		unit.stats.movement = unit.getMovementReserved();
+        		//ユニットの移動可能範囲を描画する
+        		gameMap.drawMovementRange();
+        		//ボタンを消す
+        		gameMap.removeMoveButtons(gameMap);
+        	};
+        	
+        	//待機ボタンのイベントを登録する
+        	moveConfirmButton.ontouchend = function(){
+        		//ユニットの移動力を戻す
+        		unit.stats.movement = unit.getMovementReserved();
+        		//ボタンを消す
+        		gameMap.removeMoveButtons(gameMap);
+        		utils.beginUIShield();	//ターンが切り替わるまで操作できないようにする
+        		
+        		//ターンを終える
+        		gameMap.controller.endTurn();
+        	};
+        	
+        	//ターンを開始する
+        	gameMap.controller.startTurn();
+        },
+        
         //スワイプ中の処理の関数
         ontouchupdate: function(params) {
         	//ローカル座標を取得し、そこからマス目を取得する
@@ -1032,6 +1232,10 @@ window.onload = function(){
             fune.frame = [0, 0, 0, 0, 1, 1, 1, 2, 2, 1, 1, 0, 0, 0, 0, 3, 3, 3];
             fune.sinkFrame = [3, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, null];
             
+            //@add 2015.0526 T.Masuda 移動前の座標を保存するメンバを追加しました。
+            this.prevX;
+            this.prevY;
+            
             this.addChild(fune);	//作成した船データを追加する
 
             //HPバーを作成する
@@ -1065,6 +1269,10 @@ window.onload = function(){
                 hpMax:     stats.hpMax,
                 speed:     stats.speed
             };
+            
+            //@add 2015.0526 T.Masuda 移動力を保存するようにしました
+            this.movementReserved = stats.movement;
+            
             //初期HPを設定する
             this.stats.hp = this.stats.hpMax;
 
@@ -1079,10 +1287,23 @@ window.onload = function(){
             return this.stats.id;
         },
 
-        getMovement: function() {
-            return this.stats.movement;
+        /*
+         * 関数名:getMovementReserved
+         * 引数  :なし
+         * 戻り値:なし
+         * 概要  :保存された移動力を返す
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+        getMovementReserved: function() {
+            return this.movementReserved;	//保存された移動力を返す
         },
 
+        //移動力を取得する
+        getMovement: function() {
+        	return this.stats.movement;
+        },
+        
         getRange: function() {
             return this.stats.range;
         },
@@ -1193,7 +1414,7 @@ window.onload = function(){
                 var explosion = new Explosion();
                 explosion.x = otherFune.x +32;
                 explosion.y = otherFune.y +32;
-                this.player.controller.sndManager.playFX(sndExplosion);
+                this.player.controller.sndManager.playFX(sndShot);
                 game.currentScene.addChild(explosion);
 
                 if (isCritical) {
@@ -1201,7 +1422,7 @@ window.onload = function(){
                     var self = this;
                     alertWindow.onTouch = function() {
                         if (afterHp <= 0) {
-                            var alertWindow = new AlertWindow("沈没...", self.player.controller);
+                            var alertWindow = new AlertWindow("戦闘不能", self.player.controller);
                             alertWindow.onTouch = function() {
                                 otherFune.sinkShip();
                                 self.player.controller.endTurn();
@@ -1212,7 +1433,7 @@ window.onload = function(){
                     }
                 } else {
                     if (afterHp <= 0) {
-                        var alertWindow = new AlertWindow("沈没...", this.player.controller);
+                        var alertWindow = new AlertWindow("戦闘不能", this.player.controller);
                         var self = this;
                         alertWindow.onTouch = function() {
                             otherFune.sinkShip();
@@ -1248,7 +1469,7 @@ window.onload = function(){
                 popup.onSkill = function() {
                 	//@mod 2015.0525 条件式&&以下を追加しました。
                 	//スキルが使える状態かつ、現在行動中のユニットなら
-                    if (self.canUseSkill() && self.player.activeFune() === self) {
+                    if (self.canUseSkill() && self.player.activeFune === self) {
                     	//スキルを発動する
                         self.activateSkill(function() {
                         	//コールバック関数。ターンを終える
@@ -1277,17 +1498,19 @@ window.onload = function(){
         activateSkill: function(onEnd) {
             utils.beginUIShield();
             this.usedSkill = true;
-            var pirateChibi = new Sprite(512, 512);
-            pirateChibi.image = this.getChibiImage();
-            pirateChibi.opacity = 0;
-            if (this.scaleX > 0) {
-                pirateChibi.x = -50;
-            } else {
-                pirateChibi.x = GAME_SCREEN_WIDTH -512 +50;
-            }
+            //@mod 2015.0527 T.Masuda 発動時にキャラを出さないようにしました
+//            var pirateChibi = new Sprite(512, 512);
+//            pirateChibi.image = this.getChibiImage();
+//            pirateChibi.opacity = 0;
+//            if (this.scaleX > 0) {
+//                pirateChibi.x = -50;
+//            } else {
+//                pirateChibi.x = GAME_SCREEN_WIDTH -512 +50;
+//            }
             var alertWindow = new AlertWindow(this.getSkillName(), this.player.controller);
-            alertWindow.addChild(pirateChibi, alertWindow.firstChild);
-            pirateChibi.tl.fadeIn(10);
+            //@mod 2015.0527 T.Masuda 発動時にキャラを出さないようにしました
+//            alertWindow.addChild(pirateChibi, alertWindow.firstChild);
+//            pirateChibi.tl.fadeIn(10);
             var self = this;
             alertWindow.onTouch = function() {
                 self.processSkill(onEnd);
@@ -1381,39 +1604,49 @@ window.onload = function(){
 
     });
 
-    //ドイツ兵
-    var deutschSoldier = Class.create(BaseFune, {
+    //プレイヤー兵1(チーフ)。隊長であり、やられると負けとなる
+    var Player01 = Class.create(BaseFune, {
     	initialize: function(id) {
+        	//@mod 2015.0527 T.Masuda ステータスを調整しました。リーダーとして優秀なステータスを設定しました。
     		BaseFune.call(this, id, {
     			movement:  4,
     			range:     3,
     			attack:  100,
-    			defense:  50,
+    			defense:  70,
     			hpMax:   120,
-    			speed:	5
+    			speed:	8
     		});
 
-    		//画像幅の定数
-    		//ドイツ兵画像
-    		DEUTSCH_WIDTH = 24; DEUTSCH_HEIGHT = 32;
-    		
     		//高さを変更する
-    		this.fune.height = DEUTSCH_HEIGHT;
+    		this.fune.height = HIGH_TIP_HEIGHT;
     		//幅を変更する
-    		this.fune.width = DEUTSCH_WIDTH;
-    		//画像が小さめなので拡大倍率を指定する
-    		this.fune.scaleX = DEUTSCH_SCALE;
-    		this.fune.scaleY = DEUTSCH_SCALE;
+    		this.fune.width = TIP_LENGTH;
     		
-    		//ドイツ兵のスプライトシートを使う
-    		this.fune.image = game.assets[deustchSoldier]; 
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
+    		
+    		//プレイヤー1兵のスプライトシートを使う
+    		this.fune.image = game.assets[player01]; 
     		//アニメ設定           
-    		this.fune.frame = [10, 10, 10, 9, 9, 9, 11, 11, 11, 9, 9];
-    		this.fune.sinkFrame = [12, 12, null, null, 12, 12, null, null, 12, 12, null, null];
+    		this.fune.frame = TO_SIDE_FRAME.player01;
+    		this.fune.sinkFrame = SINK_FRAME.player01;
     	},
     	
     	getCaptainName: function() {
-    		return "ドイツ兵";
+    		return "チーフ";
+    	},
+    	
+        /*
+         * 関数名:getUnitName
+         * 引数  :なし
+         * 戻り値:String:ユニット名を返す
+         * 概要  :ユニット名の文字列を返す
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "player01";
     	},
     	
     	getSkillName: function() {
@@ -1434,7 +1667,7 @@ window.onload = function(){
     	sinkShip: function() {
     		this.player.controller.sndManager.playFX(sndSinkShip);
     		//隊長の生存フラグを下ろし、ターン終了の関数で負けにする
-    		//this.player.leaderLiving = false;
+    		this.player.leaderLiving = false;
     		
     		this.player.removeFune(this);
     		this.counter = 1;
@@ -1447,6 +1680,304 @@ window.onload = function(){
     			    };
     	}
     	
+    });
+
+    //プレイヤー兵2。複数存在する
+    var Player02 = Class.create(BaseFune, {
+    	//@mod 2015.0527 T.Masuda ステータスを調整しました。一兵卒ステータスにしました
+    	initialize: function(id) {
+    		BaseFune.call(this, id, {
+    			movement:  3,
+    			range:     3,
+    			attack:  80,
+    			defense:  50,
+    			hpMax:   100,
+    			speed:	4
+    		});
+ 
+    		
+    		//高さを変更する
+    		this.fune.height = HIGH_TIP_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
+    		
+    		//プレイヤー2兵のスプライトシートを使う
+    		this.fune.image = game.assets[player02]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.player01;
+    		this.fune.sinkFrame = SINK_FRAME.player01;
+    	},
+    	
+    	getCaptainName: function() {
+    		return "隊員";
+    	},
+
+        /*
+         * 関数名:getUnitName
+         * 引数  :なし
+         * 戻り値:String:ユニット名を返す
+         * 概要  :ユニット名の文字列を返す
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "player02";
+    	},
+    	
+    	getSkillName: function() {
+    		return "バレットフィーバー";
+    	},
+    	
+    	processSkill: function(onEnd) {
+    		var damage = this.stats.attack;
+    		var count = this.player.controller.getNonActivePlayer().getFuneCount();
+    		for(var i=0; i < count; i++) {
+    			var fune = this.player.controller.getNonActivePlayer().getFune(i);
+    			if (this.withinRange(fune.i, fune.j)) {
+    				var afterHp = fune.takeDamage(damage);
+    				var explosion = new Explosion();
+    				explosion.x = fune.x +32;
+    				explosion.y = fune.y +32;
+    				this.player.controller.sndManager.playFX(sndExplosion);
+    				game.currentScene.addChild(explosion);
+    				
+    				if (afterHp <= 0) {
+    					fune.sinkShip();
+    				}
+    			}
+    		}
+    		onEnd();
+    	},
+    });    
+    
+    //敵兵01クラス
+    var Enemy01 = Class.create(BaseFune, {
+    	//@mod 2015.0527 T.Masuda ステータスを調整しました。攻撃寄りです
+        initialize: function(id) {
+            BaseFune.call(this, id, {
+                movement:  4,
+                range:     3,
+                attack:   65,
+                defense:  45,
+                hpMax:    55,
+                speed:	6
+            });
+
+    		//高さを変更する
+    		this.fune.height = HIGH_TIP_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
+    		
+    		//敵兵01のスプライトシートを使う
+    		this.fune.image = game.assets[enemy01]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.player01;
+    		this.fune.sinkFrame = SINK_FRAME.player01;
+        },
+
+        getCaptainName: function() {
+            return "警備兵";
+        },
+
+        /*
+         * 関数名:getUnitName
+         * 引数  :なし
+         * 戻り値:String:ユニット名を返す
+         * 概要  :ユニット名の文字列を返す
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "enemy01";
+    	},
+        
+        getSkillName: function() {
+            return "ガッツ";
+        },
+
+        processSkill: function(onEnd) {
+            this.stats.attack  += 10;
+            this.stats.defense += 10;
+            onEnd();
+        },
+    });
+
+    //敵兵02クラス
+    var Enemy02 = Class.create(BaseFune, {
+    	initialize: function(id) {
+        	//@mod 2015.0527 T.Masuda ステータスを調整しました。防御寄りです
+    		BaseFune.call(this, id, {
+    			movement:  4,
+    			range:     4,
+    			attack:   50,
+    			defense:  60,
+    			hpMax:    80,
+    			speed:	2
+    		});
+    		
+    		//高さを変更する
+    		this.fune.height = HIGH_TIP_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
+    		
+    		//敵兵01のスプライトシートを使う
+    		this.fune.image = game.assets[enemy02]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.player01;
+    		this.fune.sinkFrame = SINK_FRAME.player01;
+    	},
+    	
+    	getCaptainName: function() {
+    		return "警備兵";
+    	},
+    	
+    	/*
+    	 * 関数名:getUnitName
+    	 * 引数  :なし
+    	 * 戻り値:String:ユニット名を返す
+    	 * 概要  :ユニット名の文字列を返す
+    	 * 作成日:2015.05.26
+    	 * 作成者:T.M
+    	 */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "enemy02";
+    	},
+    	
+    	getSkillName: function() {
+    		return "ガッツ";
+    	},
+    	
+    	processSkill: function(onEnd) {
+    		this.stats.attack  += 10;
+    		this.stats.defense += 10;
+    		onEnd();
+    	},
+    });
+    
+    //敵兵03クラス
+    var Enemy03 = Class.create(BaseFune, {
+    	initialize: function(id) {
+        //@mod 2015.0527 T.Masuda ステータスを調整しました。スピード寄りです
+   		BaseFune.call(this, id, {
+    			movement:  6,
+    			range:     2,
+    			attack:   50,
+    			defense:  30,
+    			hpMax:    60,
+    			speed:	7
+    		});
+    		
+    		//高さを変更する
+    		this.fune.height = HIGH_TIP_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
+    		
+    		//敵兵01のスプライトシートを使う
+    		this.fune.image = game.assets[enemy03]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.player01;
+    		this.fune.sinkFrame = SINK_FRAME.player01;
+    	},
+    	
+    	getCaptainName: function() {
+    		return "警備兵";
+    	},
+    	
+    	/*
+    	 * 関数名:getUnitName
+    	 * 引数  :なし
+    	 * 戻り値:String:ユニット名を返す
+    	 * 概要  :ユニット名の文字列を返す
+    	 * 作成日:2015.05.26
+    	 * 作成者:T.M
+    	 */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "enemy03";
+    	},
+    	
+    	getSkillName: function() {
+    		return "ガッツ";
+    	},
+    	
+    	processSkill: function(onEnd) {
+    		this.stats.attack  += 10;
+    		this.stats.defense += 10;
+    		onEnd();
+    	},
+    });
+    
+    //敵兵04クラス。生体兵器(ゾンビのようなモンスター)
+    var Enemey04 = Class.create(BaseFune, {
+    	initialize: function(id) {
+    		//@mod 2015.0527 ステータスを調整しました。近接型のパラメータです。
+    		BaseFune.call(this, id, {
+    			movement:  7,
+    			range:     1,
+    			attack:   70,
+    			defense:  60,
+    			hpMax:    100,
+    			speed:	7
+    		});
+    		
+    		//高さを変更する
+    		this.fune.height = HIGH_TIP_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
+    		
+    		//敵兵01のスプライトシートを使う
+    		this.fune.image = game.assets[enemy03]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.player01;
+    		this.fune.sinkFrame = SINK_FRAME.player01;
+    	},
+    	
+    	getCaptainName: function() {
+    		return "生体兵器";
+    	},
+    	
+    	/*
+    	 * 関数名:getUnitName
+    	 * 引数  :なし
+    	 * 戻り値:String:ユニット名を返す
+    	 * 概要  :ユニット名の文字列を返す
+    	 * 作成日:2015.05.26
+    	 * 作成者:T.M
+    	 */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "enemy04";
+    	},
+
+    	//@mod 2015.0527 T.Masuda スキル名を変えました
+    	getSkillName: function() {
+    		return "強襲";
+    	},
+    	
+    	//@mod 2015.0527 T.Masuda スキルで上昇するパラメータを攻撃力と防御力から、攻撃力と移動力に変えました
+    	processSkill: function(onEnd) {
+    		this.stats.attack  += 10;
+    		this.stats.movement += 2;
+    		onEnd();
+    	},
     });
     
     //速い船
@@ -1572,6 +2103,8 @@ window.onload = function(){
         },
     });
 
+
+    
     //敵の船の基底クラス
     var TekiFune = Class.create(BaseFune, {
         initialize: function(id) {
@@ -1772,40 +2305,53 @@ window.onload = function(){
 
         //船データを削除する関数
         removeFune: function(fune) {
-        	//ユニットからのプレイヤーへの参照を無効にする
-            delete fune.player;
             
+            //@mod 2015.0527 T.Masuda filter関数を使って配列を作成するようにしました
+        	//行動順リストを取得する
+        	var turnList = this.manager.turnList;
+       	
             //ユニットのリストを更新するため、配列を生成する
-            var newList = [];
+            var newList = turnList.filter(function(v, i) {
+            	//削除対象のユニットが現在の行動順より後ろであれば
+            	if( v.unit === fune && i >= this.activeUnit){
+	    			//行動順がずれるので、行動順の数値を修正する
+	    			this.activeUnit -= 1;
+        		}
+            	  return (v.unit !== fune);	//やられたユニットを除外する
+            });
             //ユニットの数を数えるループ
-            for (var i=0; i < this.getFuneCount(); ++i) {
-            	//ユニットを取得し、それがやられたユニットでなければ
-                if (this.getFune(i) != fune) {
-                	//ユニットリストに該当するユニットを登録する
-                    newList.push(this.getFune(i));
-                }
-            }
-            //プレイヤーのユニットのリストを更新する
-            this.funeList = newList;
-
-            //@mod 2015.0522 T.Masuda 行動順リストからやられたユニットを削除する記述を追加しました
-            //行動順リストを取得する
-            var turnList = this.manager.turnList;
-            //やられたユニットを見つけるループを開始する
-            for(var i = 0; i < turnList.length; i++){
-            	//ユニットが見つかったら
-            	if(fune === turnList[i]["unit"]){
-            		//該当するインデックス(=ユニットの連想配列)を削除する
-            		delete turnList[i];
-            		//削除するユニットが行動後であれば
-            		if(i >= this.activeUnit){
-            			//行動順がずれるので、行動順の数値を修正する
-            			this.activeUnit -= 1;
-            		}
-            	}
-            }
+//            for (var i=0; i < this.getFuneCount(); ++i) {
+//            	//ユニットを取得し、それがやられたユニットでなければ
+//                if (this.getFune(i) != fune) {
+//                	//ユニットリストに該当するユニットを登録する
+//                    newList.push(this.getFune(i));
+//                }
+//            }
+//            //プレイヤーのユニットのリストを更新する
+//            this.funeList = newList;
+//
+//            //@mod 2015.0522 T.Masuda 行動順リストからやられたユニットを削除する記述を追加しました
+//            //行動順リストを取得する
+//            var turnList = this.manager.turnList;
+//            //やられたユニットを見つけるループを開始する
+//            
+//            for(var i = 0; i < turnList.length; i++){
+//            	//ユニットが見つかったら
+//            	if(fune === turnList[i]["unit"]){
+//            		//該当するインデックス(=ユニットの連想配列)を削除する
+//            		delete turnList[i];
+//            		//削除するユニットが行動後であれば
+//            		if(i >= this.activeUnit){
+//            			//行動順がずれるので、行動順の数値を修正する
+//            			this.activeUnit -= 1;
+//            		}
+//            	}
+//            }
             //ここまで変更しました
-            
+
+            //@mod 2015.0527 T.Masuda コードの位置を変更しました。この関数の最初の行からこの位置へ移動しました。
+            //delete fune.player;
+            this.manager.turnList = newList;
             //やられたユニットがアクティブであれば
             if (this.activeFune == fune) {
             	//ユニットのアクティブ判定をnullにする
@@ -1840,7 +2386,9 @@ window.onload = function(){
         //船をアクティブ状態にする関数
         setActiveFune: function(fune) {
             this.activeFune = fune;
-            this.controller.updateTurn();
+            //@mod 2015.0526 T.Masuda updateTurn内でこの関数をコールするよう
+            //変更したため、無限ループ防止目的でこのコードを外しました。
+            //this.controller.updateTurn();
         },
     });
 
@@ -2468,12 +3016,11 @@ window.onload = function(){
                 }
             } else {
                 // プレイヤー1に船を４つあげよう
-                player1.addFune(new CaptainFune(1));
-                //@mod 2015.0526 T.Masuda 試験的にドイツ兵を追加 
-//                player1.addFune(new HayaiFune(2));
-                player1.addFune(new deutschSoldier(11));
-                player1.addFune(new KataiFune(3));
-                player1.addFune(new KougekiFune(4));
+                //@mod 2015.0526 T.Masuda ユニット構成を変更しました 
+                player1.addFune(new Player01(11));
+                player1.addFune(new Player02(12));
+                player1.addFune(new Player02(12));
+                player1.addFune(new Player02(12));
             }
 
             // 船の初期の位置
@@ -2651,21 +3198,26 @@ window.onload = function(){
 
         //ターン更新処理の関数
         updateTurn: function() {
-        	//
-            //this.map.setActiveFune(this.getActivePlayer().getActiveFune());
-        	//動かすユニットを決める
-            this.map.setActiveFune(this.turnList[this.activeUnit]["unit"]);
+        	//@mod 2015.0525 T.Masuda アクティブなユニットを決める
+        	//ゲームマップ、プレイヤーのクラスインスタンスでそれぞれアクティブユニットを更新する
+            this.map.setActiveFune(this.turnList[this.activeUnit]['unit']);
+            this.getActivePlayer().setActiveFune(this.turnList[this.activeUnit]["unit"]);
             
             this.map.drawMovementRange();
             this.frameUI.updateTurn(this.turnCounter);
             this.frameUI.updatePlayer(this.getActivePlayer().getData("name"));
-            this.sndManager.playFX(sndChangeShips);
-            //ユニットの行動順の表示を更新する
+            //@mod 2015.0527 不要なサウンドと判断し、除去しました。
+            //     this.sndManager.playFX(sndChangeShips);
+            //@add 2015.0525 T.Masuda ユニットの行動順の表示を更新する
             this.map.showUnitTurn(3, UNITTURN_X, UNITTURN_Y);
         },
 
         //ターン終了の関数
         endTurn: function() {
+        	//@add 2015.0526 T.Masuda 移動後の行動を選択するボタンを消すコードを追加しました
+        	this.map.removeMoveButtons(this.map);
+    		//@add 2015.0526 T.Masuda ユニットの移動力を戻す。
+    		this.map.activeFune.stats.movement = this.map.activeFune.getMovementReserved();
         	//アクティブプレイヤーを取得する
             var player = this.getActivePlayer();
             player.setActive(false);	//アクティブプレイヤーを非アクティブ状態の設定にする
@@ -2962,9 +3514,23 @@ window.onload = function(){
                 case 10:
                 case "kougeki_teki":
                 	return new KougekiTeki(10);
+                //@add 2015.0526 T.Masuda プレイヤー01ユニット追加
                 case 11:
-                case "deutschSoldier":
-                	return new deutschSoldier(11);
+                case "Player01":
+                	return new Player01(11);
+                //@add 2015.0526 T.Masuda プレイヤー02ユニット追加
+                case 12:
+                case "Player02":
+                	return new Player02(12);
+                case 13:
+                case "enemy01":
+                	return new Enemy01(13);
+                case 14:
+                case "enemy02":
+                	return new Enemy02(14);
+                case 15:
+                case "enemy03":
+                	return new Enemy03(15);
             }
         },
     })
@@ -2974,28 +3540,27 @@ window.onload = function(){
      */
     var FrameUI = Class.create({
         initialize: function(scene) {
-            var fontColor = "rgba(255, 255, 105, 1.0)";
 
             this.turnLabel = new Label();
             scene.addChild(this.turnLabel);
             this.turnLabel.x = TIP_LENGTH*5;
             this.turnLabel.y = GAME_SCREEN_HEIGHT -40;
             this.turnLabel.font = NORMAL_FONT_STYLE;
-            this.turnLabel.color = fontColor;
+            this.turnLabel.color = FONT_YELLOW;
 
             this.playerLabel = new Label();
             scene.addChild(this.playerLabel);
             this.playerLabel.x = TIP_LENGTH;
             this.playerLabel.y = GAME_SCREEN_HEIGHT -40;
             this.playerLabel.font = NORMAL_FONT_STYLE;
-            this.playerLabel.color = fontColor;
+            this.playerLabel.color = FONT_YELLOW;
 
             this.stageLabel = new Label();
             scene.addChild(this.stageLabel);
             this.stageLabel.x = TIP_LENGTH*8;
             this.stageLabel.y = GAME_SCREEN_HEIGHT -40;
             this.stageLabel.font = NORMAL_FONT_STYLE;
-            this.stageLabel.color = fontColor;
+            this.stageLabel.color = FONT_YELLOW;
 
             this.settingsButton = new Sprite(TIP_LENGTH, TIP_LENGTH);
             scene.addChild(this.settingsButton);
@@ -3142,60 +3707,60 @@ window.onload = function(){
             statsGroup.y = 32;
             windowGroup.addChild(statsGroup);
 
-            var fontColor = "rgba(255, 255, 105, 1.0)";
-
             //ステータス表示
-            captainLabel = new Label("船長："+fune.getCaptainName());
+            captainLabel = new Label("ユニット："+fune.getCaptainName());
             statsGroup.addChild(captainLabel);
             captainLabel.x = 0;
             captainLabel.y = 0;
             captainLabel.font = NORMAL_FONT_STYLE;
-            captainLabel.color = fontColor;
+            captainLabel.color = FONT_YELLOW;
 
             attackLabel = new Label("攻撃力："+fune.getAttack());
             statsGroup.addChild(attackLabel);
             attackLabel.x = 0;
             attackLabel.y = TIP_LENGTH *1;
             attackLabel.font = NORMAL_FONT_STYLE;
-            attackLabel.color = fontColor;
+            attackLabel.color = FONT_YELLOW;
 
             defenseLabel = new Label("防御力："+fune.getDefense());
             statsGroup.addChild(defenseLabel);
             defenseLabel.x = 0;
             defenseLabel.y = TIP_LENGTH *2;
             defenseLabel.font = NORMAL_FONT_STYLE;
-            defenseLabel.color = fontColor;
+            defenseLabel.color = FONT_YELLOW;
 
-            movementLabel = new Label("移動力："+fune.getMovement());
+            //@mod 2015.0526 T.Masuda 移動力を、移動力を保存するメンバから取得するようにしました。 
+            movementLabel = new Label("移動力："+fune.getMovementReserved());
             statsGroup.addChild(movementLabel);
             movementLabel.x = 0;
             movementLabel.y = TIP_LENGTH *3;
             movementLabel.font = NORMAL_FONT_STYLE;
-            movementLabel.color = fontColor;
+            movementLabel.color = FONT_YELLOW;
 
             rangeLabel = new Label("攻撃の距離："+fune.getRange());
             statsGroup.addChild(rangeLabel);
             rangeLabel.x = 0;
             rangeLabel.y = TIP_LENGTH *4;
             rangeLabel.font = NORMAL_FONT_STYLE;
-            rangeLabel.color = fontColor;
+            rangeLabel.color = FONT_YELLOW;
 
             hpLabel = new Label("HP："+fune.getHP()+"/"+fune.getHPMax());
             statsGroup.addChild(hpLabel);
             hpLabel.x = 0;
             hpLabel.y = TIP_LENGTH *5;
             hpLabel.font = NORMAL_FONT_STYLE;
-            hpLabel.color = fontColor;
+            hpLabel.color = FONT_YELLOW;
 
             //ここまでステータス
 
             //海賊の画像
-            var pirate = new Sprite(400, GAME_SCREEN_HEIGHT);
-            pirate.x = 350;
-            pirate.y = -50;
-            pirate.opacity = 0;
-            pirate.image = fune.getImage();
-            windowGroup.addChild(pirate);
+            //@mod 2015.0527 新キャラ画像が用意できるまで画像を表示しないようにします。
+//            var pirate = new Sprite(400, GAME_SCREEN_HEIGHT);
+//            pirate.x = 350;
+//            pirate.y = -50;
+//            pirate.opacity = 0;
+//            pirate.image = fune.getImage();
+//            windowGroup.addChild(pirate);
 
             //キャンセルボタン
             var self = this;
@@ -3214,7 +3779,7 @@ window.onload = function(){
 
             //必殺技使用済みなら
             //@mod 2015.0525 T.Masuda アクティブではないユニットのステータスウィンドウならスキルを発動できない色にするよう変更しました
-            if (fune.usedSkill ||fune == fune.player.getActiveFune()) {
+            if (fune.usedSkill ||fune !== fune.player.getActiveFune()) {
             	//必殺技ボタンを半透明にして使用済みの表現を行う
                 skillBtnSprite.opacity = 0.5;
             }
@@ -3225,8 +3790,9 @@ window.onload = function(){
             windowGroup.scaleY = 0.7;
             //ウィンドウの出現時の処理
             windowGroup.tl.scaleTo(1, 10, enchant.Easing.ELASTIC_EASEOUT).then(function() {
-                pirate.y = -50;
-                pirate.tl.moveBy(-50, -25, 5).and().fadeIn(10);
+                //@mod 2015.0527 新キャラ画像が用意できるまで画像を表示しないようにします。
+//                pirate.y = -50;
+//                pirate.tl.moveBy(-50, -25, 5).and().fadeIn(10);
 
                 //キャンセルボタンのアニメーション
                 cancelBtnSprite.addEventListener(enchant.Event.TOUCH_START, function(params) {
@@ -3236,7 +3802,8 @@ window.onload = function(){
                 cancelBtnSprite.addEventListener(enchant.Event.TOUCH_END, function(params) {
                     shieldSprite.tl.fadeTo(0, 5);
                     cancelBtnSprite.tl.scaleTo(0.9, 3).and().fadeTo(0, 5);
-                    pirate.tl.fadeTo(0, 5);
+                    //@mod 2015.0527 新キャラ画像が用意できるまで画像を表示しないようにします。
+//                    pirate.tl.fadeTo(0, 5);
                     windowSprite.tl.fadeTo(0, 5).then(function() {
                         game.popScene();
                         fune.player.controller.sndManager.playFX(sndClick);
@@ -3256,7 +3823,8 @@ window.onload = function(){
                     skillBtnSprite.addEventListener(enchant.Event.TOUCH_END, function(params) {
                         shieldSprite.tl.fadeTo(0, 5);
                         skillBtnSprite.tl.scaleTo(0.9, 3).and().fadeTo(0, 5);
-                        pirate.tl.fadeTo(0, 5);
+                        //@mod 2015.0527 新キャラ画像が用意できるまで画像を表示しないようにします。
+//                        pirate.tl.fadeTo(0, 5);
                         windowSprite.tl.fadeTo(0, 5).then(function() {
                             game.popScene();
                             fune.player.controller.sndManager.playFX(sndClick);
@@ -3335,14 +3903,12 @@ window.onload = function(){
             this.windowSprite = windowSprite;
 
             
-            var fontColor = "rgba(255, 255, 105, 1.0)";
-
             messageLabel = new Label(message);
             this.addChild(messageLabel);
             messageLabel.x = windowSprite.x +40;
             messageLabel.y = windowSprite.y +TIP_LENGTH;
             messageLabel.font = NORMAL_FONT_STYLE;
-            messageLabel.color = fontColor;
+            messageLabel.color = FONT_YELLOW;
             //@add 2015.0525 クラスオブジェクトにラベルへの参照を持たせました
             this.messageLabel = messageLabel;
             
@@ -3389,7 +3955,7 @@ window.onload = function(){
             //画像パスが第3引数にセットされていれば
             if(image !== void(0) && image != ''){
             	//顔写真のスプライトを作る
-            	var faceImage = new Sprite(100, 100);
+            	var faceImage = new Sprite(FACE_IMAGE_SIZE, FACE_IMAGE_SIZE);
             	//画像をセットする
             	faceImage.image = game.assets[image];
             	//ウィンドウにスプライトを追加する
@@ -3404,8 +3970,6 @@ window.onload = function(){
         	//本来のラベルを消す
         	this.removeChild(this.messageLabel);
         	
-        	//フォントの色を設定する
-        	var fontColor = "rgba(255, 255, 105, 1.0)";
         	//ループでラベルを作成する
         	for(var i = 0; text.length > 0; i++){
         		//新たなラベルを生成する
@@ -3416,9 +3980,9 @@ window.onload = function(){
         		//切り出した残りを自らにセットする
         		text = text.substr(MESSAGE_NUMBER_PER_LINE);
         		label.font = DEMO_FONT_STYLE;	//このウィンドウ用のフォントをセットする
-        		label.color = fontColor;		//フォントの色をセットする
-        		//ラベルの座標をセットする
-        		label.x = this.windowSprite.x + WINDOW_MARGIN + faceImage.width;
+        		label.color = FONT_YELLOW;		//フォントの色をセットする
+        		//ラベルの座標をセットする。顔グラフィックからずらす。
+        		label.x = this.windowSprite.x + WINDOW_MARGIN + FACE_IMAGE_SIZE;
         		label.y = this.windowSprite.y + (DEMOWINDOW_LABEL_HEIGHT * (i + 1));
         	}
         }
@@ -3453,14 +4017,12 @@ window.onload = function(){
             settingsGroup.y = 32;
             windowGroup.addChild(settingsGroup);
 
-            var fontColor = "rgba(255, 255, 105, 1.0)";
-
             soundLabel = new Label("音量");
             settingsGroup.addChild(soundLabel);
             soundLabel.x = 0;
             soundLabel.y = 16;
             soundLabel.font = NORMAL_FONT_STYLE;
-            soundLabel.color = fontColor;
+            soundLabel.color = FONT_YELLOW;
 
             var sndUpButton = new Sprite(TIP_LENGTH, TIP_LENGTH);
             settingsGroup.addChild(sndUpButton);
