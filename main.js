@@ -3,7 +3,8 @@
  */
 enchant();
 
-
+//マップのタイルへの参照を保存する定数
+TILES = null;
 
 //定数を宣言する
 RECOVER_HP = 0.5;	//ステージ終了後の回復倍率
@@ -83,6 +84,48 @@ WINDOW_MARGIN = 40;
 //メッセージウィンドウの顔グラフィックのサイズ
 FACE_IMAGE_SIZE = 100;
 
+//マップデータ
+MAP_DATA = [
+                  [
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                      [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0],
+                      [0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      ],
+                      [
+                       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+                       [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+                       [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       ],
+                       [
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                        ]
+                      
+                  ];
+
+
+
+
+
 //ウィンドウロード時のイベント
 window.onload = function(){
 	
@@ -116,9 +159,13 @@ window.onload = function(){
     game.preload(mystery);
     
     
-    //マップのマス目のスプライトシート
+    //マップのマス目のスプライトシート1
     var mapTiles  = "resources/maptiles.png";
     game.preload(mapTiles);
+    
+    //マップのマス目のスプライトシート2
+    var mapTiles2  = "resources/ui/grayTiles.jpg";
+    game.preload(mapTiles2);
 
     //マップのUIの画像
     var mapUI  = "resources/mapui.png";
@@ -373,7 +420,7 @@ window.onload = function(){
     /**
      * Map のマスの定義
      */
-    var tileTypes = {
+    var tileTypes01 = {
         umi:  {id:0, name:"umi"},	//通常の海
         arai: {id:1, name:"arai"},	//荒海
         asai: {id:2, name:"asai"},	//浅瀬
@@ -381,6 +428,11 @@ window.onload = function(){
         iwa:  {id:4, name:"iwa"},	//岩場
     };
 
+    var tileTypes02 = {
+    		normal:  {id:0, name:"normal"},	//通常のマス
+    		object: {id:1, name:"object"},	//障害物のマス
+    };
+    
     /**
      * GameMap クラスの定義
      */
@@ -413,88 +465,11 @@ window.onload = function(){
             scene.addChild(background);
             this.background = background;
 
-            // マス。Mapクラスを利用してマス目状にスプライトを配置できるようにする
-            var tiles = new Map(TIP_LENGTH, TIP_LENGTH);
-            tiles.image = game.assets[mapTiles];
-            tiles.x = TIP_LENGTH;
-            tiles.y = 10;
-            //マップデータをロードする
-            tiles.loadData(mapData);
-            //透明にする
-            tiles.opacity = 1;
-            scene.addChild(tiles);
-            this.tiles = tiles;
-
-            // マップを大きさを保存
-            this.mapHeight = mapData.length;	//マップの高さ
-            this.mapWidth  = mapData[0].length;	//マップの幅
-
-            //　元のマップデータから陸や岩のcollisionデータを生成します
-            var mapCollisionData = [];
-            //マップの高さ(マス目の数)分ループする
-            for(var j=0; j < this.mapHeight; j++) {
-            	//行データの配列を作る
-                mapCollisionData[j] = [];
-                //マップの幅(マス目の数)分ループする
-                for(var i=0; i < this.mapWidth; i++) {
-                	//該当するマップデータが通行不能のマスをさしていたら
-                    if (mapData[j][i] == tileTypes.riku.id || mapData[j][i] == tileTypes.iwa.id) {
-                        mapCollisionData[j].push(1);	//コリジョンデータの二次元配列に1をセットする
-                    //通行可能マスであれば
-                    } else {
-                    	//0を追加する
-                        mapCollisionData[j].push(0);
-                    }
-                }
-            }
-            //作成したマップのあたり判定データをtilesに追加する
-            this.tiles.collisionData = mapCollisionData;
-
-            // 検索用のデータ。移動コストデータを格納する
-            var mapSearchData = [];			//中量級の船
-            var mapSearchDataLight  = [];	//軽量級の船
-            var mapSearchDataHeavy  = [];	//重量級の船
-
-            //あたり判定データ生成時と同様のループを行う
-            for(var j=0; j < this.mapHeight; j++) {
-            	//各配列に行データの空配列を追加する
-                mapSearchData[j] = [];
-                mapSearchDataLight[j] = [];
-                mapSearchDataHeavy[j] = [];
-                //マップデータの行を走査する
-                for(var i=0; i < this.mapWidth; i++) {
-                	//通行不能のマスであれば
-                    if (mapData[j][i] == tileTypes.riku.id || mapData[j][i] == tileTypes.iwa.id) {
-                    	//各配列に0を追加する
-                        mapSearchData[j].push(0);
-                        mapSearchDataLight[j].push(0);
-                        mapSearchDataHeavy[j].push(0);
-                    //荒海のマスであれば
-                    } else {
-                        if (mapData[j][i] == tileTypes.arai.id) {
-                        	//船の重量に応じた値を各配列に追加する。以下の分岐も同様となる
-                            mapSearchData[j].push(2);
-                            mapSearchDataLight[j].push(3);
-                            mapSearchDataHeavy[j].push(1);
-                        //浅瀬のマスであれば
-                        } else if (mapData[j][i] == tileTypes.asai.id) {
-                            mapSearchData[j].push(2);
-                            mapSearchDataLight[j].push(1);
-                            mapSearchDataHeavy[j].push(3);
-                        //普通の海であれば
-                        } else {
-                            mapSearchData[j].push(1);
-                            mapSearchDataLight[j].push(1);
-                            mapSearchDataHeavy[j].push(1);
-                        }
-                    }
-                }
-            }
-
-            //Aスターサーチ用の各船重量別のグラフを作る
-            this.searchGraph = new Graph(mapSearchData);
-            this.searchGraphLight = new Graph(mapSearchDataLight);
-            this.searchGraphHeavy = new Graph(mapSearchDataHeavy);
+            //マス目のクラスオブジェクトを作る。
+            //定数に参照を保存しておく
+            var tiles = this.loadStageMap(mapTiles2, mapData);	//変数にマス目への参照を保存する
+            this.scene.addChild(tiles);	//シーンに作成したタイルのマップを追加する
+            this.tiles = tiles;			//作成したマス目への参照を保存する
 
             //各レイヤーのデータを作り、シーンに追加する
             // underLayer
@@ -519,7 +494,93 @@ window.onload = function(){
             scene.addChild(overLayer);
             this.overLayer = overLayer;
 
-            //GameMapクラス自身の設定を行う
+        },
+
+        /*
+         * 関数名:loadStageMap
+         * 引数  :String imagePath:タイル画像のパス
+		 *		:Array MapData:マップデータの2次元配列
+         * 戻り値:Map:作成したマップデータを返す
+         * 概要  :マップデータからタイル画像を使ったマップを作る
+         * 作成日:2015.05.27
+         * 作成者:T.M
+         */
+        loadStageMap: function(imagePath, mapData){
+        	var tiles = TILES;
+        	
+        	if(tiles == null){
+        		// マス。Mapクラスを利用してマス目状にスプライトを配置できるようにする
+        		TILES = new Map(TIP_LENGTH, TIP_LENGTH);
+        		tiles = TILES;
+        		tiles.image = game.assets[imagePath];	//タイルの画像をセットする
+        		//配置する座標を指定する
+        		tiles.x = TIP_LENGTH;
+        		tiles.y = 10;
+        	}
+        	
+            //マップデータをロードする
+            tiles.loadData(mapData);
+
+            // マップを大きさを保存
+            this.mapHeight = mapData.length;	//マップの高さ
+            this.mapWidth  = mapData[0].length;	//マップの幅
+
+            //　元のマップデータから陸や岩のcollisionデータを生成します
+            var mapCollisionData = [];
+            //マップの高さ(マス目の数)分ループする
+            for(var j=0; j < this.mapHeight; j++) {
+            	//行データの配列を作る
+                mapCollisionData[j] = [];
+                //マップの幅(マス目の数)分ループする
+                for(var i=0; i < this.mapWidth; i++) {
+                	//該当するマップデータが通行不能のマスをさしていたら
+                    if(mapData[j][i] == 1) {
+                        mapCollisionData[j].push(1);	//コリジョンデータの二次元配列に1をセットする
+                    //通行可能マスであれば
+                    } else {
+                    	//0を追加する
+                        mapCollisionData[j].push(0);
+                    }
+                }
+            }
+            //作成したマップのあたり判定データをtilesに追加する
+            tiles.collisionData = mapCollisionData;
+
+            // 検索用のデータ。移動コストデータを格納する
+            var mapSearchData = [];			//中量級の船
+            var mapSearchDataLight  = [];	//軽量級の船
+            var mapSearchDataHeavy  = [];	//重量級の船
+
+            //あたり判定データ生成時と同様のループを行う
+            for(var j=0; j < this.mapHeight; j++) {
+            	//各配列に行データの空配列を追加する
+                mapSearchData[j] = [];
+                mapSearchDataLight[j] = [];
+                mapSearchDataHeavy[j] = [];
+                //マップデータの行を走査する
+                for(var i=0; i < this.mapWidth; i++) {
+                	//通行不能のマスであれば
+                    if (mapData[j][i] == 1) {
+                    	//各配列に0を追加する
+                        mapSearchData[j].push(0);
+                        mapSearchDataLight[j].push(0);
+                        mapSearchDataHeavy[j].push(0);
+                    //通常のマスであれば
+                    } else {
+                        mapSearchData[j].push(1);
+                        mapSearchDataLight[j].push(1);
+                        mapSearchDataHeavy[j].push(1);
+                    }
+                }
+            }
+
+            //Aスターサーチ用の各船重量別のグラフを作る
+            this.searchGraph = new Graph(mapSearchData);
+            this.searchGraphLight = new Graph(mapSearchDataLight);
+            this.searchGraphHeavy = new Graph(mapSearchDataHeavy);
+
+        	
+        	//GameMapクラス自身の設定を行う
             var self = this;			//自身を変数に格納する
             tiles.touchEnabled = true;	//タッチを有効にする
             //タッチイベントを登録する
@@ -540,8 +601,9 @@ window.onload = function(){
             tiles.addEventListener(enchant.Event.ENTER_FRAME, function(params){
                 self.zsort();	//zsortを行う
             })
+       	
+            return tiles;	//作成したタイルのインスタンスを返す
         },
-
         //操作プレイヤーをセットする関数
         setController: function(controller) {
             this.controller = controller;	//GameMapに操作プレイヤーを登録する
@@ -586,10 +648,11 @@ window.onload = function(){
         //マス目の情報を取得して返す関数
         getTileInfo:function(id) {
         	//マス目のデータの存在チェックを行うループ
-            for(t in tileTypes) {
+        	//@mod 2015.0528 T.Masuda 新たに作成したタイル情報の連想配列を走査するように変更
+            for(t in tileTypes02) {
             	//指定したIDがマス目情報の連想配列にあれば
-                if (tileTypes[t].id == id) {
-                    return tileTypes[t];	//該当するデータを返す
+                if (tileTypes02[t].id == id) {
+                    return tileTypes02[t];	//該当するデータを返す
                 }
             }
         },
@@ -1754,16 +1817,17 @@ window.onload = function(){
     	},
     });    
     
-    //敵兵01クラス
+    //敵兵01クラス。敵のリーダーとなる
     var Enemy01 = Class.create(BaseFune, {
     	//@mod 2015.0527 T.Masuda ステータスを調整しました。攻撃寄りです
         initialize: function(id) {
             BaseFune.call(this, id, {
                 movement:  4,
-                range:     3,
-                attack:   65,
-                defense:  45,
-                hpMax:    55,
+                range:     4,
+                attack:   70,
+                defense:  50,
+                hpMax:    1,
+//                hpMax:    100,
                 speed:	6
             });
 
@@ -1783,7 +1847,7 @@ window.onload = function(){
         },
 
         getCaptainName: function() {
-            return "警備兵";
+            return "警備兵リーダー";
         },
 
         /*
@@ -1807,6 +1871,22 @@ window.onload = function(){
             this.stats.attack  += 10;
             this.stats.defense += 10;
             onEnd();
+        },
+        //やられ処理の関数を上書きする
+        sinkShip: function() {
+        	this.player.controller.sndManager.playFX(sndSinkShip);
+        	//隊長の生存フラグを下ろし、ターン終了の関数で負けにする
+        	this.player.leaderLiving = false;
+        		
+        	this.player.removeFune(this);
+        	this.counter = 1;
+        	this.fune.frame = this.fune.sinkFrame;
+        	this.onenterframe = function(){ // enterframe event listener
+        		            this.counter++;
+        		if (this.counter == 12 ) {
+        			this.parentNode.removeChild(this);
+        		}
+        	};
         },
     });
 
@@ -2309,49 +2389,27 @@ window.onload = function(){
             //@mod 2015.0527 T.Masuda filter関数を使って配列を作成するようにしました
         	//行動順リストを取得する
         	var turnList = this.manager.turnList;
-       	
+        	var self = this;	//コールバック関数内でのthisの参照変更への対処
             //ユニットのリストを更新するため、配列を生成する
             var newList = turnList.filter(function(v, i) {
-            	//削除対象のユニットが現在の行動順より後ろであれば
-            	if( v.unit === fune && i >= this.activeUnit){
-	    			//行動順がずれるので、行動順の数値を修正する
-	    			this.activeUnit -= 1;
-        		}
             	  return (v.unit !== fune);	//やられたユニットを除外する
             });
-            //ユニットの数を数えるループ
-//            for (var i=0; i < this.getFuneCount(); ++i) {
-//            	//ユニットを取得し、それがやられたユニットでなければ
-//                if (this.getFune(i) != fune) {
-//                	//ユニットリストに該当するユニットを登録する
-//                    newList.push(this.getFune(i));
-//                }
-//            }
-//            //プレイヤーのユニットのリストを更新する
-//            this.funeList = newList;
-//
-//            //@mod 2015.0522 T.Masuda 行動順リストからやられたユニットを削除する記述を追加しました
-//            //行動順リストを取得する
-//            var turnList = this.manager.turnList;
-//            //やられたユニットを見つけるループを開始する
-//            
-//            for(var i = 0; i < turnList.length; i++){
-//            	//ユニットが見つかったら
-//            	if(fune === turnList[i]["unit"]){
-//            		//該当するインデックス(=ユニットの連想配列)を削除する
-//            		delete turnList[i];
-//            		//削除するユニットが行動後であれば
-//            		if(i >= this.activeUnit){
-//            			//行動順がずれるので、行動順の数値を修正する
-//            			this.activeUnit -= 1;
-//            		}
-//            	}
-//            }
-            //ここまで変更しました
 
             //@mod 2015.0527 T.Masuda コードの位置を変更しました。この関数の最初の行からこの位置へ移動しました。
             //delete fune.player;
             this.manager.turnList = newList;
+            
+            delete fune.player;
+
+            var newUnitList = [];
+            for (var i=0; i < this.getFuneCount(); ++i) {
+                if (this.getFune(i) != fune) {
+                	newUnitList.push(this.getFune(i));
+                }
+            }
+            this.funeList = newUnitList;
+
+            
             //やられたユニットがアクティブであれば
             if (this.activeFune == fune) {
             	//ユニットのアクティブ判定をnullにする
@@ -3026,7 +3084,7 @@ window.onload = function(){
             // 船の初期の位置
             var startPositions = {
                 player1: [
-                    {i: 0, j: 8}, {i: 0, j: 6}, {i: 1, j: 7}, {i: 2, j: 8}
+                    {i: 1, j: 7}, {i: 1, j: 5}, {i: 2, j: 6}, {i: 3, j: 7}
                 ],
             }
             this.setStartPositions(startPositions);
@@ -3042,7 +3100,8 @@ window.onload = function(){
             stageId = stageId ? stageId: 1; 
             //ステージIDに応じたステージをセットする
             this.setupStage(stageId);
-
+            //マップを描画し直す
+            this.map.tiles = this.map.loadStageMap(mapTiles2, MAP_DATA[stageId - 1]);
             this.sndManager.playBGM();
             //@add 2015.0520 行動順リストを作る
             this.createTurnList();
@@ -3154,6 +3213,7 @@ window.onload = function(){
             //CPUプレイヤーの準備を開始する。CPUプレイヤーのデータを変数に入れる
             var player2 = this.getPlayer(2);
             player2.leaderLiving = true;	//CPUプレイヤーのリーダー生存フラグを立て直す
+            
             //ステージデータがなくなったらステージ1からやり直すため、ステージIDをステージ数で割った余りを
             var stageData = StageData[stageIndex];	//ステージデータを取得する
             //ループでステージデータの配置を行う
@@ -3342,6 +3402,16 @@ window.onload = function(){
                 //勝利時の処理
                 if (winner.id == 1) {
                     resultBanner.image = game.assets[uiWin];
+                    //@add 2015.0528 T.Masuda 勝敗が決まった後に残ったユニットを掃除します
+                    var player2 = self.getPlayer(2);
+                    if(self.turnList.length){
+                    	for(var i = 0; i < player2.funeList.length; i++){
+                    		var underdog = player2.funeList[i];
+                    		underdog.fune.opacity = 0;
+                    		underdog.sinkShip();
+                    	}
+                    }
+
                     //タッチ処理
                     touchable.onTouch = function() {
                     	
@@ -3350,6 +3420,10 @@ window.onload = function(){
                         
                         //次のステージをセットする
                         self.setupStage(self.stageId + 1);
+                        
+                        
+                        //マップを描画し直す
+                        self.map.loadStageMap(mapTiles2, MAP_DATA[self.stageId - 1]);
                         //行動順をリセットする
                         self.activeUnit = 0;
                         //ユニットの行動順番リストを作る
@@ -4332,19 +4406,20 @@ window.onload = function(){
         var manager = new GameManager();
 
         // マスのデータ
-        var mapDisplayData = [
-            [3, 3, 2, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0],
-            [3, 2, 0, 0, 2, 3, 3, 2, 0, 1, 0, 0, 0],
-            [3, 0, 4, 0, 2, 3, 3, 2, 0, 0, 0, 0, 0],
-            [3, 0, 0, 0, 0, 2, 2, 0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 0, 4, 0, 0, 0, 1, 1, 0, 4, 0],
-            [1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2],
-            [0, 0, 0, 3, 3, 2, 0, 0, 0, 0, 4, 2, 3],
-            [0, 0, 0, 3, 3, 3, 2, 0, 0, 2, 2, 3, 3],
-        ];
+//        var mapDisplayData = [
+//            [3, 3, 2, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0],
+//            [3, 2, 0, 0, 2, 3, 3, 2, 0, 1, 0, 0, 0],
+//            [3, 0, 4, 0, 2, 3, 3, 2, 0, 0, 0, 0, 0],
+//            [3, 0, 0, 0, 0, 2, 2, 0, 1, 1, 0, 0, 0],
+//            [0, 0, 0, 0, 4, 0, 0, 0, 1, 1, 0, 4, 0],
+//            [1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0],
+//            [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2],
+//            [0, 0, 0, 3, 3, 2, 0, 0, 0, 0, 4, 2, 3],
+//            [0, 0, 0, 3, 3, 3, 2, 0, 0, 2, 2, 3, 3],
+//        ];
 
-        var map = new GameMap(sceneGameMain, mapDisplayData, manager);
+        //マップを作る
+        var map = new GameMap(sceneGameMain, MAP_DATA[0], manager);
         manager.setMap(map);
 
         var frameUI = new FrameUI(sceneGameMain);
