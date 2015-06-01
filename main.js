@@ -71,7 +71,7 @@ BUTTON_WIDTH = 100;	//ボタンの幅
 NORMAL_FONT_STYLE = "32px 'ＭＳ ゴシック', arial, sans-serif";
 //ステージデモのフォントを作成する
 DEMO_FONT_STYLE = "24px 'ＭＳ Pゴシック', arial, sans-serif";
-//ステージデモのフォントを作成する
+//移動後の行動選択ラベルボタンのフォントを作成する
 MOVE_BUTTON_FONT_STYLE = "20px 'ＭＳ Pゴシック', arial, sans-serif";
 //スキル仕様時メッセージのフォントを作成する
 SKILL_MESSAGE_FONT = "28px 'ＭＳ Pゴシック', arial, sans-serif";
@@ -79,6 +79,8 @@ SKILL_MESSAGE_FONT = "28px 'ＭＳ Pゴシック', arial, sans-serif";
 FONT_YELLOW = "rgba(255, 255, 105, 1.0)";
 //白抜き文字
 FONT_WHITE = "rgba(255, 255, 255, 1.0)";
+//灰色の文字
+FONT_GRAY = "rgba(175, 175, 175, 1.0)";
 
 
 //ステージデモのメッセージ1行の文字数
@@ -92,7 +94,6 @@ FACE_IMAGE_SIZE = 100;
 
 //マップデータ。ステージデータのJSファイルから読み込む
 MAP_DATA = MapData;
-
 
 //ウィンドウロード時のイベント
 window.onload = function(){
@@ -113,26 +114,19 @@ window.onload = function(){
     game.preload(mapFrame);	//マップ画像をプリロードする。
     //以下同様に画像をプリロードしていく
     
-    //ステージの背景画像の設定の配列
+    //ステージの背景画像の設定の配列。stageData.jsで定義したデータを読み込んでいく
     var stageBackground = [StageData.length];
     for(var i = 0; i < StageData.length; i++){
     	stageBackground[i] = StageData[i]["stageBackground"];
     }
     //石畳ダンジョンの背景
-    var stoneTile  = "resources/pipo-battlebg009.jpg";
-    game.preload(stoneTile);
-    //ミステリアス背景
-    var mystery  = "resources/pipo-battlebg010.jpg";
-    game.preload(mystery);
+    var institute  = stageBackground[0];
+    game.preload(institute);
     
     
     //マップのマス目のスプライトシート
-    //@mod 2015.0528 T.Masuda 画像パスを変更しました
-//    var mapTiles  = "resources/ui/grayTiles.jpg";
-//    game.preload(mapTiles);
-
-    //@mod 2015.0528 T.Masuda 画像パスを変更しました
-    var mapTiles  = "resources/ui/cyberTile.png";
+    //@mod 2015.0601 T.Masuda 画像を変更しました
+    var mapTiles  = "resources/tile/cyberTile.png";
     game.preload(mapTiles);
     
     //マップの移動可否のタイルの画像
@@ -328,9 +322,39 @@ window.onload = function(){
      * Map のマスの定義
      */
     //@mod 2015.0528 T.Masuda マスの定義を大幅変更
-    var tileTypes = {
-    		normal:  {id:0, name:"normal"},	//通常のマス
-    		object: {id:1, name:"object"},	//障害物のマス
+    //@mod 2015.0601 T.Masuda cyberTile.pngのマスに合わせたタイルデータに変更
+    var tileTypes = 
+    {
+    		//キー = マップチップの番号 through = 0,通行可能 = 1,通行不可能
+    		4:  {through:0},
+    		6:  {through:0},
+    		21:  {through:1},
+    		28:  {through:1},
+    		36:  {through:1},
+    		42:  {through:1},
+    		59:  {through:1},
+    		66:  {through:1},
+    		72:  {through:1},
+    		74:  {through:1},
+    		89:  {through:1},
+    		126:  {through:1},
+    		127:  {through:1},
+    		128:  {through:1},
+    		132:  {through:1},
+    		147:  {through:1},
+    		149:  {through:1},
+    		189:  {through:1},
+    		191:  {through:1},
+    		194:  {through:1},
+    		206:  {through:1},
+    		219:  {through:1},
+    		220:  {through:1},
+    		221:  {through:0},
+    		224:  {through:1},
+    		234:  {through:1},
+    		235:  {through:1},
+    		236:  {through:0},
+    		239:  {through:1},
     };
 
     /**
@@ -692,11 +716,11 @@ window.onload = function(){
             //あたり判定テストを行い、通れる場所なら
             if (this.tiles.hitTest(localPosition.x, localPosition.y) == true) {
             	//その場所は通れないというログを出す
-                console.log("通れない", tileInfo.name, "world X", params.x, "localX", localPosition.x, "worldY", params.y, "localY", localPosition.y)
+                //console.log("通れない", tileInfo.name, "world X", params.x, "localX", localPosition.x, "worldY", params.y, "localY", localPosition.y)
             //通れる場所なら
             } else {
             	//通れるログを出す
-                console.log("通れる", tileInfo.name, "world X", params.x, "localX", localPosition.x, "worldY", params.y, "localY", localPosition.y)
+               // console.log("通れる", tileInfo.name, "world X", params.x, "localX", localPosition.x, "worldY", params.y, "localY", localPosition.y)
 
                 //マス目を取得する
                 var tile = this.getMapTileAtPosition(localPosition.x, localPosition.y);
@@ -744,13 +768,32 @@ window.onload = function(){
         setStageMap:function(mapData, stageId){
         	//マップデータをロードする
         	this.tiles.loadData(mapData);
-        	//あたり判定データをセットする。現状ではマップデータイコールとなる
-        	this.tiles.collisionData = mapData;
  
             // マップを大きさを取得する
             this.mapHeight = mapData.length;	//マップの高さ
             this.mapWidth  = mapData[0].length;	//マップの幅
-        	
+
+            //@mod 2015.0601 T.Masuda あたり判定をマップデータから作成するようにしました
+            //　元のマップデータから陸や岩のcollisionデータを生成します
+            var mapCollisionData = [];
+            //マップの行を走査する
+            for(var j=0; j < this.mapHeight; j++) {
+                mapCollisionData[j] = [];	//行の配列を作る
+                //マップの列を走査する
+                for(var i=0; i < this.mapWidth; i++) {
+                	//通行不可能のマスであれば
+                    if (tileTypes[String(mapData[j][i])].through == 1) {
+                        mapCollisionData[j].push(1);	//通行不可能のデータを追加する
+                    //通行可能であれば
+                    } else {
+                        mapCollisionData[j].push(0);	//通行可能のデータを追加する
+                    }
+                }
+            }
+            
+        	//あたり判定データをセットする
+        	this.tiles.collisionData = mapCollisionData;
+            
             // 検索用のデータ。移動コストデータを格納する
             var mapSearchData = [];			//中量級の船
             var mapSearchDataLight  = [];	//軽量級の船
@@ -763,7 +806,7 @@ window.onload = function(){
                 //マップデータの行を走査する
                 for(var i=0; i < this.mapWidth; i++) {
                 	//通行不能のマスであれば
-                    if (mapData[j][i] == 1) {
+                    if (tileTypes[String(mapData[j][i])].through == 1) {
                     	//各配列に0を追加する
                         mapSearchData[j].push(0);
                     //通常のマスであれば
@@ -801,11 +844,12 @@ window.onload = function(){
         	gameMap.moveCancelButton = moveCancelButton;
         	//フォントを設定する
         	moveCancelButton.font = MOVE_BUTTON_FONT_STYLE;
-        	moveCancelButton.color = FONT_WHITE;
+        	moveCancelButton.color = FONT_GRAY;
+        	moveCancelButton.backgroundColor = FONT_WHITE;
         	
         	return moveCancelButton;	//作成したボタンを返す
         },
-        
+
         /*
          * 関数名:createMoveConfirmButton
          * 引数  :GameMap gameMap:ゲームのマップ
@@ -827,7 +871,8 @@ window.onload = function(){
         	gameMap.moveConfirmButton = moveConfirmButton;
         	//フォントの色を設定する
         	moveConfirmButton.font = MOVE_BUTTON_FONT_STYLE;
-        	moveConfirmButton.color = FONT_WHITE;
+        	moveConfirmButton.color = FONT_GRAY;
+        	moveConfirmButton.backgroundColor = FONT_WHITE;
 
         	return moveConfirmButton;	//作成したボタンを返す
         },
@@ -2736,6 +2781,7 @@ window.onload = function(){
                     	}
                     	//各プレイヤーを回復
                         self.refreshPlayer(self.getPlayer(1));
+                        self.refreshPlayer(self.getPlayer(2));
                         
                         //次のステージをセットする
                         self.setupStage(self.stageId + 1);
@@ -3969,8 +4015,8 @@ window.onload = function(){
     	processSkill: function(onEnd) {
     		this.stats.attack  += 10;
     		this.stats.defense  -= 20;
-    		this.stats.movement += 2;
-    		this.movementReserved += 2;
+    		this.stats.movement += 1;
+    		this.movementReserved += 1;
     		onEnd();
     	},
     });
