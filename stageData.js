@@ -1,44 +1,61 @@
+//ステージデータ
 (function() {
 	//画像パスの連想配列を用意する
 	var imagePath ={
-			ocean:"resources/pipo-battlebg009.jpg",
-			stoneTile:"resources/pipo-battlebg010.jpg",
-			mystery:"resources/map00.png",
+			stoneTile:"resources/pipo-battlebg009.jpg",
+			mystery:"resources/pipo-battlebg010.jpg",
 			pirate0:"resources/pirate00thumb.png",
 			pirate1:"resources/pirate01thumb.png",
 			pirate2:"resources/pirate02thumb.png",
 			pirate3:"resources/pirate03thumb.png"
 	}
-    /* detect a dollar object or create one if not found */
+	//ステージのユニットと背景データ
     window.StageData = [
         {
+        	//ステージ1
             startPositions: [
- //               {type: "enemy01", i: 11, j: 1},
-//                {type: "enemy02", i: 8, j: 1},
- //               {type: "enemy03", i: 10, j: 3}
-                {type: "enemy01", i: 2, j: 7}
-            ],
-            stageBackground:imagePath.stoneTile
-        },
-        {
-            startPositions: [
-//                             {type: "enemy01", i: 9, j: 1},
-                             {type: "enemy02", i: 7, j: 1},
-                             {type: "enemy02", i: 7, j: 2},
-                             {type: "enemy03", i: 10, j: 3},
-                             {type: "enemy01", i: 2, j: 7}
+                {type: "enemy02", i: 7, j: 3},
+                {type: "enemy03", i: 6, j: 3}
             ],
             stageBackground:imagePath.mystery
         },
         {
+        	//ステージ2
+            startPositions: [
+                             {type: "enemy02", i: 5, j: 1},
+                             {type: "enemy03", i: 9, j: 3},
+                             {type: "enemy01", i: 8, j: 4}
+            ],
+            stageBackground:imagePath.mystery
+        },
+        {
+        	//ステージ3
+        	startPositions: [
+        	                 {type: "enemy01", i: 9, j: 1},
+        	                 {type: "enemy02", i: 7, j: 2},
+        	                 {type: "enemy04", i: 9, j: 3},
+			],
+			stageBackground:imagePath.mystery
+        },
+        {
+        	//ステージ4
         	startPositions: [
         	                 {type: "enemy01", i: 9, j: 1},
         	                 {type: "enemy02", i: 7, j: 1},
-        	                 {type: "enemy02", i: 5, j: 1},
-        	                 {type: "enemy03", i: 9, j: 3},
-        	                 {type: "enemy03", i: 8, j: 3}
-			],
-			stageBackground:imagePath.ocean
+        	                 {type: "enemy03", i: 5, j: 1},
+        	                 {type: "enemy04", i: 9, j: 3},
+        	                 ],
+        	                 stageBackground:imagePath.mystery
+        },
+        {
+        	//ステージ5
+        	startPositions: [
+        	                 {type: "enemy04", i: 9, j: 1},
+        	                 {type: "enemy04", i: 7, j: 3},
+        	                 {type: "enemy04", i: 5, j: 2},
+        	                 {type: "enemy04", i: 6, j: 3},
+        	                 ],
+        	                 stageBackground:imagePath.mystery
         }
     ];
     
@@ -46,27 +63,103 @@
     window.DemoData = [
                        [
                         {message:"Stage 1",portrait:""},
-//                        {message:"チーフ:ここが報告にあった研究施設か……",portrait:""},
-//                        {message:"チーフ:発展途上国には似つかわしい装備の兵士ばかりだな",portrait:""},
-//                        {message:"チーフ:バックに大きな組織か国がついているのは間違いない",portrait:""},
-//                        {message:"チーフ:幸い数はたいしたものではない。速やかに制圧するぞ",portrait:""}
+                        {message:"チーフ:ここが報告にあった研究施設か……",portrait:""},
+                        {message:"チーフ:発展途上国には似つかわしい装備の兵士ばかりだな",portrait:""},
+                        {message:"チーフ:バックに大きな組織か国がついているのは間違いない",portrait:""},
+                        {message:"チーフ:幸い数はたいしたものではない。速やかに制圧するぞ",portrait:""}
                         ],
                         [
                         {message:"Stage 2",portrait:""},
+                        {message:"チーフ:敵小隊を発見した。このままいけば先手が取れるな",portrait:""},
+                        {message:"チーフ:さっきの奴らは単なる見張りだな。今度は騒ぎを聞きつけて対処しにきた奴らだ",portrait:""},
+                        {message:"チーフ:ここからが本番だ!各員、一気に殲滅するぞ!",portrait:""}
+                        ],
+                        [
+                         {message:"Stage 3",portrait:""},
                         {message:"チーフ:何だ、あれは!?モンスター!?",portrait:""},
-//                        {message:"チーフ:こいつら、とんでもないものを作っていやがる",portrait:""},
-//                        {message:"チーフ:あの体つき、飛びかかりでもされたらひとたまりもないな",portrait:""},
-//                        {message:"チーフ:距離を取って集中砲火を浴びせるぞ!",portrait:""},
-//                        {message:"チーフ:さあ、化け物退治のはじまりだ!",portrait:""}
+                        {message:"チーフ:こいつら、とんでもないものを作ってやるようだな",portrait:""},
+                        {message:"チーフ:あの体つき、飛びかかりでもされたらひとたまりもないな",portrait:""},
+                         {message:"チーフ:距離を取って集中砲火を浴びせるぞ!",portrait:""},
+                        {message:"チーフ:さあ、化け物退治のはじまりだ!",portrait:""}
+                         ],
+                       [
+                        {message:"Stage 4",portrait:""},
+                        {message:"チーフ:数が多いだけでなく、さっきの化け物まで連れてやがる",portrait:""},
+                        {message:"チーフ:あまり長居はしたくないところだな",portrait:""},
+                        {message:"チーフ:既にこの施設の中心部も近い",portrait:""},
+                        {message:"チーフ:相手は手強いが、一気に突破して中心部を爆破するぞ",portrait:""},
+                        {message:"チーフ:各員、ここが正念場だ!全力を尽くせ!",portrait:""}
                         ],
                        [
-                        {message:"Stage 3",portrait:""},
-//                        {message:"チーフ:さっきの化け物がこんなにうじゃうじゃいやがる",portrait:""},
-//                        {message:"チーフ:さっさと焼き払っておさらばするか",portrait:""},
-//                        {message:"チーフ:!? チ、感覚も鋭いみたいだな。隠れているつもりだったが",portrait:""},
-//                        {message:"チーフ:あの脚力が相手では到底逃げられん。速やかに掃討した後、施設を爆破する。",portrait:""},
-//                        {message:"チーフ:さっさと終わらせて国に帰るぞ!",portrait:""}
+                        {message:"Stage 5",portrait:""},
+                        {message:"チーフ:ここが中心部か・・・",portrait:""},
+                        {message:"チーフ:あの化け物がうじゃうじゃいやがる。さっさと焼き払っておさらばするか",portrait:""},
+                        {message:"チーフ:!? チ、見つかったか。出来はいいようだな",portrait:""},
+                        {message:"チーフ:あの脚力が相手では到底逃げられん。速やかに掃討した後、施設を爆破する。",portrait:""},
+                        {message:"チーフ:さっさと終わらせて国に帰るぞ!",portrait:""}
                         ]
     ];
-    
+    //マップのデータ
+    window.MapData = [
+                [
+                 	//1面
+                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+                    [0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    ],
+                    //2面
+                    [
+                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+                     [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                     ],
+                     //3面
+                     [
+                      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+                      [0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1],
+                      ],
+                //4面
+	                [
+	                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	                 [0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+	                 [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+	                 ],
+	                //5面
+	                [
+	                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	                 [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+	                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0],
+	                 [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+	                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	                 [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+	                 ]
+                ];
 })();

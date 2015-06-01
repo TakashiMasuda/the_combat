@@ -8,23 +8,24 @@ enchant();
 //定数を宣言する
 RECOVER_HP = 0.5;	//ステージ終了後の回復倍率
 //アニメーションのフレームの配列を宣言する
+//ユニット画像の向きで分ける
 TO_UP_FRAME = {
-		player01:[12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15]
-//    	player02:[57 , 57, 57, 57, 57, 57, 58, 58, 58, 58, 58, 58, 59, 59, 59, 59, 59, 59, 58, 58, 58, 58, 58, 58]
+		front:[12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15],
+    	quarter:[4 , 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7]
 };
 TO_LOW_FRAME = {
-		player01:[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3]
-//		player02:[81 , 81, 81, 81, 81, 81, 82, 82, 82, 82, 82, 82, 83, 83, 83, 83, 83, 83, 82, 82, 82, 82, 82, 82]
+		front:[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3],
+		quarter:[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3]
 };
 TO_SIDE_FRAME = {
-		player01:[8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11]
-//		player02:[69 , 69, 69, 69, 69, 69, 70, 70, 70, 70, 70, 70, 71, 71, 71, 71, 71, 71, 70, 70, 70, 70, 70, 70]
+		front:[8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11],
+		quarter:[8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11]
 };
 
 //ユニットやられ時のフレーム
 SINK_FRAME = {
-		player01:[12, 12, null, null, 12, 12, null, null, 12, 12, null, null]
-//		player02:[60, 60, null, null, 60, 60, null, null, 60, 60, null, null]
+		front:[12, 12, null, null, 12, 12, null, null, 12, 12, null, null],
+		quarter:[5, 5, null, null, 5, 5, null, null, 5, 5, null, null]
 };
 
 //デフォルトプレイヤー名
@@ -39,13 +40,17 @@ TIP_LENGTH = 64;
 //@add 2015.0527 T.Masuda キャラの画像の高さ。幅は共通の値
 HIGH_TIP_HEIGHT = 98;
 
-character_SPRITE_HEIGHT = 393 / 4;
-
+//味方兵キャラチップの高さ
+PLAYER_SOLDIER_HEIGHT = 393 / 4;
+//敵兵キャラチップの高さ
+ENEMY_SOLDIER_HEIGHT = 418 / 4;
+//生体兵器(モンスター)の高さ
+MONSTER_HEIGHT = 94;
 
 
 //ユニットの行動順番を表示する領域の座標の定数2つ
-UNITTURN_X = TIP_LENGTH * 10;
-UNITTURN_Y = TIP_LENGTH * 8;
+UNITTURN_X = TIP_LENGTH * 11;
+UNITTURN_Y = TIP_LENGTH * 9;
 
 //ゲームのフレームレートを定数にする
 FRAME_RATE = 30;
@@ -68,6 +73,8 @@ NORMAL_FONT_STYLE = "32px 'ＭＳ ゴシック', arial, sans-serif";
 DEMO_FONT_STYLE = "24px 'ＭＳ Pゴシック', arial, sans-serif";
 //ステージデモのフォントを作成する
 MOVE_BUTTON_FONT_STYLE = "20px 'ＭＳ Pゴシック', arial, sans-serif";
+//スキル仕様時メッセージのフォントを作成する
+SKILL_MESSAGE_FONT = "28px 'ＭＳ Pゴシック', arial, sans-serif";
 //黄色のフォントカラー
 FONT_YELLOW = "rgba(255, 255, 105, 1.0)";
 //白抜き文字
@@ -75,7 +82,7 @@ FONT_WHITE = "rgba(255, 255, 255, 1.0)";
 
 
 //ステージデモのメッセージ1行の文字数
-MESSAGE_NUMBER_PER_LINE = 7;
+MESSAGE_NUMBER_PER_LINE = 10;
 //ステージデモのメッセージ1行分の高さ
 DEMOWINDOW_LABEL_HEIGHT = 30;
 //ウィンドウのマージン
@@ -83,12 +90,19 @@ WINDOW_MARGIN = 40;
 //メッセージウィンドウの顔グラフィックのサイズ
 FACE_IMAGE_SIZE = 100;
 
+//マップデータ。ステージデータのJSファイルから読み込む
+MAP_DATA = MapData;
+
+
 //ウィンドウロード時のイベント
 window.onload = function(){
 	
 	//ゲームのそのもののオブジェクトを作る。この時に解像度も指定する
     var game = new Core(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
     game.fps = FRAME_RATE; //fps 一秒に何回を画面更新する
+    //BGMその2
+    var sndBGM            = "resources/music/openfire.mp3";
+    game.preload(sndBGM);
 
     /**
      * 必要なファイルを相対パスで引数に指定する。 ファイルはすべて、ゲームが始まる前にロードされる。
@@ -99,10 +113,6 @@ window.onload = function(){
     game.preload(mapFrame);	//マップ画像をプリロードする。
     //以下同様に画像をプリロードしていく
     
-    //マップ背景のバナー
-    var ocean  = "resources/map00.png";
-    game.preload(ocean);
-
     //ステージの背景画像の設定の配列
     var stageBackground = [StageData.length];
     for(var i = 0; i < StageData.length; i++){
@@ -117,59 +127,26 @@ window.onload = function(){
     
     
     //マップのマス目のスプライトシート
-    var mapTiles  = "resources/maptiles.png";
+    //@mod 2015.0528 T.Masuda 画像パスを変更しました
+//    var mapTiles  = "resources/ui/grayTiles.jpg";
+//    game.preload(mapTiles);
+
+    //@mod 2015.0528 T.Masuda 画像パスを変更しました
+    var mapTiles  = "resources/ui/cyberTile.png";
     game.preload(mapTiles);
-
-    //マップのUIの画像
-    var mapUI  = "resources/mapui.png";
-    game.preload(mapUI);
-
-    //船のスプライトシート
-    var shipsSpriteSheet  = "resources/ships.png";
-    game.preload(shipsSpriteSheet);
-
-    //海賊の画像パスの配列
-    var pirateSprites = [
-        "resources/pirate00.png",
-        "resources/pirate01.png",
-        "resources/pirate02.png",
-        "resources/pirate03.png",
-    ];
     
-    //ループしてプリロードする
-    for (var i=0; i < pirateSprites.length; ++i) {
-    	game.preload(pirateSprites[i]);
-    }
-    
-    //海賊の画像パスの配列
-    var pirateSpritesthumb = [
-                         "resources/pirate00thumb.png",
-                         "resources/pirate01thumb.png",
-                         "resources/pirate02thumb.png",
-                         "resources/pirate03thumb.png",
-                         ];
-    
-    //ループしてプリロードする
-    for (var i=0; i < pirateSpritesthumb.length; ++i) {
-        game.preload(pirateSpritesthumb[i]);
-    }
+    //マップの移動可否のタイルの画像
+    var mapUI02  = "resources/ui/coverTile.jpg";
+    game.preload(mapUI02);
 
-    //海賊のちびキャラ画像パスの配列
-    var pirateChibiSprites = [
-        "resources/pirateChibi00.png",
-        "resources/pirateChibi01.png",
-        "resources/pirateChibi02.png",
-        "resources/pirateChibi03.png",
-        "resources/pirateChibi04.png",
-        "resources/pirateChibi05.png",
-    ];
-    //ループしてプリロードする
-    for (var i=0; i < pirateChibiSprites.length; ++i) {
-        game.preload(pirateChibiSprites[i]);
-    }
+    //@add 2015.0529 T.Masuda 移動の可否を示すアイコンの画像を読み込む
+    var mapUI01  = "resources/ui/mapui01.png";
+    game.preload(mapUI01);
+    
 
     //爆発アニメのスプライトシート
-    var explosionSpriteSheet  = "resources/explosion.png";
+    //@mod 2015.0529 T.Masuda 爆発アニメーションを銃撃アニメーションに差し替えました。
+    var explosionSpriteSheet  = "resources/animation/shot.png";
     game.preload(explosionSpriteSheet);
 
     //オーバーレイ用の画像
@@ -177,67 +154,44 @@ window.onload = function(){
     game.preload(ui1x1Black);
 
     //スタート画面
-    var uiStartScreen   = "resources/startScreen.png";
+    var uiStartScreen   = "resources/ui/startScreen.png";
     game.preload(uiStartScreen);
 
-    //ストーリーモードのタイトル画面
-    var uiStoryScreen   = "resources/storyScreen.png";
-    game.preload(uiStoryScreen);
-
-    //対戦モードのタイトル画面
-    var uiVSScreen   = "resources/vsScreen.png";
-    game.preload(uiVSScreen);
-
+    //@add 2015.0529 T,Masuda タイトルロゴ画像を追加
+    var titleLogo   = "resources/ui/titleLogo.png";
+    game.preload(titleLogo);
+    
     //システムメッセージのウィンドウ
-    var uiAlertScreen   = "resources/alertScreen.png";
+    var uiAlertScreen   = "resources/ui/alertScreen.png";
     game.preload(uiAlertScreen);
 
     //ウィンドウのスプライト
-    var uiWindowSprite    = "resources/window.png";
+    //@mod 2015.0529 画像変更
+    var uiWindowSprite    = "resources/ui/window.png";
     game.preload(uiWindowSprite);
 
-    //ストーリーモードのボタンのスプライト
-    var uiStoryBtnSprite = "resources/btnStory.png";
-    game.preload(uiStoryBtnSprite);
-
-    //対戦モードのボタンのスプライト
-    var uiVersusBtnSprite = "resources/btnVS.png";
-    game.preload(uiVersusBtnSprite);
-
-    //人間対戦選択のボタンのスプライト
-    var uiHumanBtnSprite = "resources/btnHuman.png";
-    game.preload(uiHumanBtnSprite);
-
-    //CPU対戦選択のボタンのスプライト
-    var uiCpuBtnSprite = "resources/btnCPU.png";
-    game.preload(uiCpuBtnSprite);
-
     //コンテニューボタンのスプライト
-    var uiContinueBtnSprite = "resources/btnContinue.png";
+    var uiContinueBtnSprite = "resources/ui/btnContinue.gif";
     game.preload(uiContinueBtnSprite);
 
     //新規開始ボタンのスプライト
-    var uiNewBtnSprite = "resources/btnNew.png";
+    var uiNewBtnSprite = "resources/ui/btnNew.gif";
     game.preload(uiNewBtnSprite);
 
-    //ツイッターのボタンのスプライト
-    var uiTwitterBtnSprite = "resources/twitter.png";
-    game.preload(uiTwitterBtnSprite);
-
     //設定画面のスプライト
-    var uiSettingsSprite    = "resources/settings.png";
+    var uiSettingsSprite    = "resources/ui/settings.png";
     game.preload(uiSettingsSprite);
 
     //キャンセルボタンのスプライト
-    var uiCancelBtnSprite = "resources/btnCancel.png";
+    var uiCancelBtnSprite = "resources/ui/btnCancel.gif";
     game.preload(uiCancelBtnSprite);
 
-    //必殺技ボタンのスプライト
-    var uiSkillBtnSprite = "resources/btnSkill.png";
+    //スキルボタンのスプライト
+    var uiSkillBtnSprite = "resources/ui/btnSkill.gif";
     game.preload(uiSkillBtnSprite);
 
     //矢印ボタンのスプライト
-    var uiArrowSprite = "resources/arrow.png";
+    var uiArrowSprite = "resources/ui/arrow.png";
     game.preload(uiArrowSprite);
 
     //HPバーの背景
@@ -253,19 +207,21 @@ window.onload = function(){
     game.preload(uiHealthGreen);
 
     //プレイヤー1のバナー
-    var uiPlayerBanner1   = "resources/playerBanner1.png";
+    var uiPlayerBanner1   = "resources/ui/player1.png";
     game.preload(uiPlayerBanner1);
 
     //プレイヤー2のバナー
-    var uiPlayerBanner2   = "resources/playerBanner2.png";
+    var uiPlayerBanner2   = "resources/ui/player2.png";
     game.preload(uiPlayerBanner2);
 
     //勝利のバナー
-    var uiWin             = "resources/win.png";
+    //@mod 2015.0529 T.Masuda フォルダ移動しました
+    var uiWin             = "resources/ui/win.png";
     game.preload(uiWin);
 
     //負けのバナー
-    var uiLose            = "resources/lose.png";
+    //@mod 2015.0529 T.Masuda フォルダ移動しました
+    var uiLose            = "resources/ui/lose.png";
     game.preload(uiLose);
 
     //プレイヤー01兵のキャラチップ(スプライトシート)
@@ -283,6 +239,9 @@ window.onload = function(){
     //エネミー03兵のキャラチップ(スプライトシート)
     var enemy03 = "resources/character/enemy03.png";
     game.preload(enemy03);
+    //エネミー04兵(モンスター)のキャラチップ(スプライトシート)
+    var enemy04 = "resources/character/enemy04.png";
+    game.preload(enemy04);
     
     /**
      * 音関連のデータをプリロードする
@@ -291,16 +250,13 @@ window.onload = function(){
 //    var sndBGM            = "resources/music/highseas.mp3";
 //    game.preload(sndBGM);
     
-    //BGMその2
-    var sndBGM            = "resources/music/openfire.mp3";
-    game.preload(sndBGM);
 
     //クリック音
     var sndClick          = "resources/sound/select.wav";
     game.preload(sndClick);
 
     //爆発音
-    var sndExplosion      = "resources/sound/shot2.wav";
+    var sndExplosion      = "resources/sound/shot.wav";
     game.preload(sndExplosion);
 
     //射撃音
@@ -308,12 +264,10 @@ window.onload = function(){
     game.preload(sndShot);
     
     //船の沈没音
-    var sndSinkShip       = "resources/sound/bomb4.wav";
+    //@mod 2015.0530 T.Masuda やられ音更新。パス書き換え
+    var sndSinkShip       = "resources/sound/defeat.mp3";
     game.preload(sndSinkShip);
 
-    //船選択音
-    var sndChangeShips    = "resources/sound/se4.wav";
-    game.preload(sndChangeShips);
 
     /**
      * 頻繁に使う関数群
@@ -373,12 +327,10 @@ window.onload = function(){
     /**
      * Map のマスの定義
      */
+    //@mod 2015.0528 T.Masuda マスの定義を大幅変更
     var tileTypes = {
-        umi:  {id:0, name:"umi"},	//通常の海
-        arai: {id:1, name:"arai"},	//荒海
-        asai: {id:2, name:"asai"},	//浅瀬
-        riku: {id:3, name:"riku"},	//陸
-        iwa:  {id:4, name:"iwa"},	//岩場
+    		normal:  {id:0, name:"normal"},	//通常のマス
+    		object: {id:1, name:"object"},	//障害物のマス
     };
 
     /**
@@ -418,83 +370,10 @@ window.onload = function(){
             tiles.image = game.assets[mapTiles];
             tiles.x = TIP_LENGTH;
             tiles.y = 10;
-            //マップデータをロードする
-            tiles.loadData(mapData);
-            //透明にする
-            tiles.opacity = 1;
-            scene.addChild(tiles);
             this.tiles = tiles;
-
-            // マップを大きさを保存
-            this.mapHeight = mapData.length;	//マップの高さ
-            this.mapWidth  = mapData[0].length;	//マップの幅
-
-            //　元のマップデータから陸や岩のcollisionデータを生成します
-            var mapCollisionData = [];
-            //マップの高さ(マス目の数)分ループする
-            for(var j=0; j < this.mapHeight; j++) {
-            	//行データの配列を作る
-                mapCollisionData[j] = [];
-                //マップの幅(マス目の数)分ループする
-                for(var i=0; i < this.mapWidth; i++) {
-                	//該当するマップデータが通行不能のマスをさしていたら
-                    if (mapData[j][i] == tileTypes.riku.id || mapData[j][i] == tileTypes.iwa.id) {
-                        mapCollisionData[j].push(1);	//コリジョンデータの二次元配列に1をセットする
-                    //通行可能マスであれば
-                    } else {
-                    	//0を追加する
-                        mapCollisionData[j].push(0);
-                    }
-                }
-            }
-            //作成したマップのあたり判定データをtilesに追加する
-            this.tiles.collisionData = mapCollisionData;
-
-            // 検索用のデータ。移動コストデータを格納する
-            var mapSearchData = [];			//中量級の船
-            var mapSearchDataLight  = [];	//軽量級の船
-            var mapSearchDataHeavy  = [];	//重量級の船
-
-            //あたり判定データ生成時と同様のループを行う
-            for(var j=0; j < this.mapHeight; j++) {
-            	//各配列に行データの空配列を追加する
-                mapSearchData[j] = [];
-                mapSearchDataLight[j] = [];
-                mapSearchDataHeavy[j] = [];
-                //マップデータの行を走査する
-                for(var i=0; i < this.mapWidth; i++) {
-                	//通行不能のマスであれば
-                    if (mapData[j][i] == tileTypes.riku.id || mapData[j][i] == tileTypes.iwa.id) {
-                    	//各配列に0を追加する
-                        mapSearchData[j].push(0);
-                        mapSearchDataLight[j].push(0);
-                        mapSearchDataHeavy[j].push(0);
-                    //荒海のマスであれば
-                    } else {
-                        if (mapData[j][i] == tileTypes.arai.id) {
-                        	//船の重量に応じた値を各配列に追加する。以下の分岐も同様となる
-                            mapSearchData[j].push(2);
-                            mapSearchDataLight[j].push(3);
-                            mapSearchDataHeavy[j].push(1);
-                        //浅瀬のマスであれば
-                        } else if (mapData[j][i] == tileTypes.asai.id) {
-                            mapSearchData[j].push(2);
-                            mapSearchDataLight[j].push(1);
-                            mapSearchDataHeavy[j].push(3);
-                        //普通の海であれば
-                        } else {
-                            mapSearchData[j].push(1);
-                            mapSearchDataLight[j].push(1);
-                            mapSearchDataHeavy[j].push(1);
-                        }
-                    }
-                }
-            }
-
-            //Aスターサーチ用の各船重量別のグラフを作る
-            this.searchGraph = new Graph(mapSearchData);
-            this.searchGraphLight = new Graph(mapSearchDataLight);
-            this.searchGraphHeavy = new Graph(mapSearchDataHeavy);
+            //マップデータをロードする
+            this.setStageMap(mapData, 1);            
+            scene.addChild(tiles);
 
             //各レイヤーのデータを作り、シーンに追加する
             // underLayer
@@ -626,7 +505,11 @@ window.onload = function(){
         //船の座標をセットする関数
         positionFune: function(fune, i, j) {
             this.positonObject(fune, i, j);	//座標を計算してマップにセットする
-
+            //プレイヤー1のユニットなら
+            if(fune.player.id == 1){
+            	//右向きに直す
+            	this.changeDirection(fune, 20, fune.j);
+            }
         },
 
         //ユニットの向きを変える関数
@@ -642,19 +525,19 @@ window.onload = function(){
         	if(beforeJ > j){
         		//@mod 2015.0526 T.Masuda フレームをユニット毎に用意するように変更したため、
         		//ユニット名でフレームリストを取得するように変更しました
-        		unit.frame = TO_UP_FRAME[PLAYER01];	//ユニットのアニメのフレームを上向きのものにする
+        		unit.frame = TO_UP_FRAME[fune.getImageDirection()];	//ユニットのアニメのフレームを上向きのものにする
         	//下に進むなら
         	} else if(beforeJ < j){
         		//@mod 2015.0526 T.Masuda フレームをユニット毎に用意するように変更したため、
         		//ユニット名でフレームリストを取得するように変更しました
-        		unit.frame = TO_LOW_FRAME[PLAYER01];	//ユニットのアニメのフレームを下向きのものにする
+        		unit.frame = TO_LOW_FRAME[fune.getImageDirection()];	//ユニットのアニメのフレームを下向きのものにする
         	//左右に進むなら
         	} else {
         		//@mod 2015.0526 T.Masuda フレームをユニット毎に用意するように変更したため、
         		//ユニット名でフレームリストを取得するように変更しました
-        		unit.frame = TO_SIDE_FRAME[PLAYER01];	//ユニットのアニメのフレームを上向きのものにする
-        		//右に進むなら
-        		if(beforeJ > i){
+        		unit.frame = TO_SIDE_FRAME[fune.getImageDirection()];	//ユニットのアニメのフレームを上向きのものにする
+        		//左に進むなら
+        		if(beforeI > i){
         			//ユニットを逆の方向に向ける
         			unit.scaleX = -1;
         		} else {
@@ -685,11 +568,19 @@ window.onload = function(){
                 //船の位置をセットする
                 fune.i = i;
                 fune.j = j;
+                
+                //@add 2015.0527 T.Masuda スプライトの縦サイズの違いへの対応のためのコードを追加しました
+                //オブジェクトにY座標補正用のメンバがあれば
+                if('replaceY' in fune){
+                	//Y座標から補正値を引く
+                	worldPosition.y -= fune.replaceY;
+                }
 
                 //マップへの参照を変数にする
                 var self = this;
                 //アニメーションしながら船を所定の位置まで移動させる
-                fune.tl.moveTo(worldPosition.x, worldPosition.y, 10 *cost, enchant.Easing.QUAD_EASEINOUT).then(function(){
+              //@add 2015.0527 T.Masuda easingを除去しました
+                fune.tl.moveTo(worldPosition.x, worldPosition.y, 10 *cost).then(function(){
                     self.moveFune(fune, path, onEnd);	//再帰し、次のマス目移動を行う
                 });
             //移動しきったら
@@ -840,6 +731,54 @@ window.onload = function(){
                 }
             }
         },
+
+        /*
+         * 関数名:setStageMap
+         * 引数  :Array mapData:マップデータの二次元配列
+         * 　　　:int stageId:ステージID
+         * 戻り値:なし
+         * 概要  :ステージの新たなマップをセットする
+         * 作成日:2015.05.28
+         * 作成者:T.M
+         */
+        setStageMap:function(mapData, stageId){
+        	//マップデータをロードする
+        	this.tiles.loadData(mapData);
+        	//あたり判定データをセットする。現状ではマップデータイコールとなる
+        	this.tiles.collisionData = mapData;
+ 
+            // マップを大きさを取得する
+            this.mapHeight = mapData.length;	//マップの高さ
+            this.mapWidth  = mapData[0].length;	//マップの幅
+        	
+            // 検索用のデータ。移動コストデータを格納する
+            var mapSearchData = [];			//中量級の船
+            var mapSearchDataLight  = [];	//軽量級の船
+            var mapSearchDataHeavy  = [];	//重量級の船
+
+            //あたり判定データ生成時と同様のループを行う
+            for(var j=0; j < this.mapHeight; j++) {
+            	//各配列に行データの空配列を追加する
+                mapSearchData[j] = [];
+                //マップデータの行を走査する
+                for(var i=0; i < this.mapWidth; i++) {
+                	//通行不能のマスであれば
+                    if (mapData[j][i] == 1) {
+                    	//各配列に0を追加する
+                        mapSearchData[j].push(0);
+                    //通常のマスであれば
+                    } else {
+                        mapSearchData[j].push(1);
+                    }
+                }
+            }
+
+            //Aスターサーチ用の各船重量別のグラフを作る
+            this.searchGraph = new Graph(mapSearchData);
+            this.searchGraphLight = new Graph(mapSearchData);
+            this.searchGraphHeavy = new Graph(mapSearchData);
+        	
+        },
         
         /*
          * 関数名:createMoveCancelButton
@@ -934,9 +873,9 @@ window.onload = function(){
         	
         	//ユニットの上に待機ボタンとキャンセルボタンを配置する
         	moveCancelButton.x = unit.x;
-        	moveCancelButton.y = unit.y - TIP_LENGTH / 3;
+        	moveCancelButton.y = unit.y - TIP_LENGTH / 3 + 3;
         	moveConfirmButton.x = unit.x; 
-        	moveConfirmButton.y = unit.y - TIP_LENGTH * 2  / 3;
+        	moveConfirmButton.y = unit.y - TIP_LENGTH * 2  / 3 + 3;
         	
         	//キャンセルボタンのイベントを登録する
         	moveCancelButton.ontouchend = function(){
@@ -966,7 +905,32 @@ window.onload = function(){
         	//ターンを開始する
         	gameMap.controller.startTurn();
         },
+
+        /*
+         * 関数名:mapMarkerValid
+         * 引数  :Sprite marker:マップマーカー
+         * 概要  :マップマーカーの表示を通行可能のほうに切り替える
+         * 作成日:2015.05.28
+         * 作成者:T.M
+         */
+        mapMarkerValid:function(marker){
+        	marker.frame = 0;	//マーカーをチェックアイコンに切り替える
+            // マップマーカーの画像が変わってから表示する。
+            marker.opacity = 1;
+        },
         
+        /*
+         * 関数名:mapMarkeriInvalid
+         * 引数  :Sprite marker:マップマーカー
+         * 概要  :マップマーカーの表示を通行不可能のほうに切り替える
+         * 作成日:2015.05.28
+         * 作成者:T.M
+         */
+        mapMarkerInvalid:function(marker){
+        	marker.frame = 1;	//マーカーを×にする
+            // マップマーカーの画像が変わってから表示する。
+        	marker.opacity = 1;
+        },
         //スワイプ中の処理の関数
         ontouchupdate: function(params) {
         	//ローカル座標を取得し、そこからマス目を取得する
@@ -981,7 +945,10 @@ window.onload = function(){
             if (this.mapMarker == undefined) {
             	//マークを作り、overLayeに追加する
                 this.mapMarker = new Sprite(TIP_LENGTH, TIP_LENGTH);
-                this.mapMarker.image = game.assets[mapUI];
+                //@mod 2015.0529 T.Masuda マップマーカーの画像を変えました。
+                this.mapMarker.image = game.assets[mapUI01];
+                //@add 2015.0529 T.Masuda マップマーカー生成時は隠しておく。
+                this.mapMarker.opacity = 0;
                 //座標をセットする
                 this.positonObject(this.mapMarker, tile.i, tile.j);
                 this.overLayer.addChild(this.mapMarker);
@@ -993,25 +960,24 @@ window.onload = function(){
 
             //通行不能の場所をさしていると
             if (this.tiles.hitTest(localPosition.x, localPosition.y) == true) {
-                this.mapMarker.frame = 1;	//灰色になる
+            	this.mapMarkerInvalid(this.mapMarker);     	//マップマーカーをNGのものにする               
             //通行可能な場所である
             } else {
             	//移動可能な場所なら
                 if (this.getManhattanDistance(this.activeFune.i, this.activeFune.j, tile.i, tile.j) <= this.activeFune.getMovement()) {
                     var path = this.getPath(this.activeFune, this.activeFune.i, this.activeFune.j, tile.i, tile.j);
+            //@mod 2015.0529 T.Masuda マップマーカーのアイコンを切り替えるコードを関数にしました。
                     //移動コストが足りていれば
                     if (path.cost <= this.activeFune.getMovement()) {
-                        //赤くする
-                        this.mapMarker.frame = 0;
+                    	this.mapMarkerValid(this.mapMarker);     	//マップマーカーをOKのものにする               
                     //足りていなければ
                     } else {
-                    	//灰色にする
-                        this.mapMarker.frame = 1;
+                    	this.mapMarkerInvalid(this.mapMarker);     	//マップマーカーをNGのものにする               
                     }
                 //移動できない場所なら
                 } else {
-                	//灰色にする
-                    this.mapMarker.frame = 1;
+                	this.mapMarkerInvalid(this.mapMarker);     	//マップマーカーをNGのものにする               
+            //ここまで変更しました
                 }
             }
         },
@@ -1042,15 +1008,18 @@ window.onload = function(){
                 var areaSprite = new Sprite(TIP_LENGTH, TIP_LENGTH);
                 //タッチイベントを起こさないようにする
                 areaSprite.touchEnabled = false;
-                areaSprite.image = game.assets[mapUI];
+                //画像をセットする
+                areaSprite.image = game.assets[mapUI02];
+                //透過する
+                areaSprite.opacity = 0.35;
                 //移動可能の場所なら
                 if (nextPostion.open) {
-                	//frameオブジェクトを2にする
-                    areaSprite.frame = 2;
+                	//frameオブジェクトを0にする
+                    areaSprite.frame = 0;
                 //そうでなければ
                 } else {
-                	//frameオブジェクトを3にsる
-                    areaSprite.frame = 3;
+                	//frameオブジェクトを1にする
+                    areaSprite.frame = 1;
                 }
                 //位置情報を登録する
                 this.positonObject(areaSprite, nextPostion.i, nextPostion.j);
@@ -1191,7 +1160,7 @@ window.onload = function(){
         		var unit = turnList[currentUnit]['unit'];
         		var image = unit.fune.image;		//ユニットの画像を取得する
         		unitTurn.image = image;				//ユニットの画像を順番領域のユニットスプライトにセットする
-        		unitTurn.frame = unit.fune.frame;	//アニメーションのフレームをセットする
+        		unitTurn.frame = 0;					//アニメーションのフレームをセットする
         		
         		//現在行動ターンではないユニットのスプライトであれば
         		if(i != 0){
@@ -1225,7 +1194,6 @@ window.onload = function(){
 
             var fune = new Sprite(TIP_LENGTH, TIP_LENGTH);	//スプライトを作成する
             this.fune = fune;				//自身の参照を持たせる
-            fune.image = game.assets[shipsSpriteSheet];	//画像をセットする
             
             //アニメーション用のフレームをセットする
             fune.frame = [0, 0, 0, 0, 1, 1, 1, 2, 2, 1, 1, 0, 0, 0, 0, 3, 3, 3];
@@ -1244,21 +1212,26 @@ window.onload = function(){
             healthBackSprite.image = game.assets[uiHealthBack];
             healthBackSprite.y     = TIP_LENGTH -6;
             this.addChild(healthBackSprite);
-
+            healthBackSprite.opacity = 0;
+            
             var healthRedSprite   = new Sprite(TIP_LENGTH, 12);
             this.healthRedSprite  = healthRedSprite;
             healthRedSprite.originX = 0
             healthRedSprite.image = game.assets[uiHealthRed];
             healthRedSprite.y     = TIP_LENGTH -6;
             this.addChild(healthRedSprite);
+            healthRedSprite.opacity = 0;
 
+            
             var healthGreenSprite   = new Sprite(TIP_LENGTH, 12);
             this.healthGreenSprite  = healthGreenSprite;
             healthGreenSprite.originX = 0
             healthGreenSprite.image = game.assets[uiHealthGreen];
             healthGreenSprite.y     = TIP_LENGTH -6;
             this.addChild(healthGreenSprite);
+            healthGreenSprite.opacity = 0;
 
+            
             //ステータスを設定する
             this.stats    = {
                 id:        id,
@@ -1345,7 +1318,11 @@ window.onload = function(){
         getChibiImage: function() {
             return game.assets[pirateChibiSprites[this.getId() -1]]
         },
-
+        //@mod 2015.0528 T.Masuda
+        //キャラ画像の向きを取得する関数を追加しました。
+        getImageDirection: function(){
+        	return this.imageDirection;	//キャラの向きのタイプの文字列を返す
+        },
         //攻撃範囲内の判定を返す関数
         withinRange: function(i, j) {
             var distance = utils.getManhattanDistance(this.i, this.j, i, j);
@@ -1354,6 +1331,19 @@ window.onload = function(){
                 return true;
             } else {
                 return false;
+            }
+        },
+        //@add 2015.0601 T.Masuda AI用に移動後の攻撃が届くかを判定する関数を作成
+        //移動後を加味した攻撃範囲内の判定を返す関数
+        withinRangeWithMove: function(i, j, target) {
+        	//移動地点とターゲットの距離を算出する
+            var distance = utils.getManhattanDistance(i, j, target.i, target.j);
+            //射程範囲なら
+            if (distance <= this.stats.range) {
+                return true;	//攻撃可能を返す
+            //射程範囲外なら
+            } else {
+                return false;	//攻撃不可能を返す
             }
         },
 
@@ -1396,7 +1386,8 @@ window.onload = function(){
             // ミス 10%
             if (attackRoll > 0.9) {
                 // クリティカル　ダメージx2
-                damage = (baseDamage +variableDamage) *2;
+            	//@mod 2015.0531 T.Masuda クリティカルヒットが強すぎるので下方修正しました
+                damage = (baseDamage +variableDamage) *1.5;
                 var isCritical = true;
             } else if (attackRoll < 0.1) {
                 // ミス ダメージ 0
@@ -1412,39 +1403,46 @@ window.onload = function(){
                 var afterHp  = otherFune.takeDamage(damage);
 
                 var explosion = new Explosion();
-                explosion.x = otherFune.x +32;
-                explosion.y = otherFune.y +32;
+                //@mod 2015 0529 T.Masuda 爆発エフェクト画像が銃撃エフェクトに変わって、画像サイズも同時に変わったため
+                //ベタ書きの補正値を消しました
+                explosion.x = otherFune.x;
+                explosion.y = otherFune.y;
                 this.player.controller.sndManager.playFX(sndShot);
                 game.currentScene.addChild(explosion);
 
                 if (isCritical) {
-                    var alertWindow = new AlertWindow("クリティカル！", this.player.controller);
-                    var self = this;
-                    alertWindow.onTouch = function() {
-                        if (afterHp <= 0) {
-                            var alertWindow = new AlertWindow("戦闘不能", self.player.controller);
-                            alertWindow.onTouch = function() {
-                                otherFune.sinkShip();
-                                self.player.controller.endTurn();
-                            }
-                        } else {
-                            self.player.controller.endTurn();
-                        }
-                    }
+                	var self = this;
+                	//攻撃演出から1秒まつ
+                    setTimeout(function(){
+	                	var alertWindow = new AlertWindow("クリティカル！", self.player.controller);
+	                    alertWindow.onTouch = function() {
+	                        if (afterHp <= 0) {
+	                            var alertWindow = new AlertWindow("戦闘不能", self.player.controller);
+	                            alertWindow.onTouch = function() {
+	                                otherFune.sinkShip();
+	                                self.player.controller.endTurn();
+	                            }
+	                        } else {
+	                            self.player.controller.endTurn();
+	                        }
+	                    }
+                    },1000);
                 } else {
                     if (afterHp <= 0) {
-                        var alertWindow = new AlertWindow("戦闘不能", this.player.controller);
-                        var self = this;
-                        alertWindow.onTouch = function() {
-                            otherFune.sinkShip();
-                            self.player.controller.endTurn();
-                        }
+                    	var self = this;
+                    	//攻撃演出から1秒まつ
+                        setTimeout(function(){
+	                        var alertWindow = new AlertWindow("戦闘不能", self.player.controller);
+	                        alertWindow.onTouch = function() {
+	                            otherFune.sinkShip();
+	                            self.player.controller.endTurn();
+	                        }
+                        }, 1000);
+                    
                     } else {
                         this.player.controller.endTurn();
                     }
-
-                }
-
+               }
             } else {
                 var alertWindow = new AlertWindow("ミス！", this.player.controller);
                 var self = this;
@@ -1507,7 +1505,8 @@ window.onload = function(){
 //            } else {
 //                pirateChibi.x = GAME_SCREEN_WIDTH -512 +50;
 //            }
-            var alertWindow = new AlertWindow(this.getSkillName(), this.player.controller);
+            //@mod 2015.0530 T.Masuda 改行対策として自作クラスdemoWindowを使うようにしました
+            var alertWindow = new DemoWindow(this.getSkillName(), this.player.controller, '', SKILL_MESSAGE_FONT);
             //@mod 2015.0527 T.Masuda 発動時にキャラを出さないようにしました
 //            alertWindow.addChild(pirateChibi, alertWindow.firstChild);
 //            pirateChibi.tl.fadeIn(10);
@@ -1534,722 +1533,55 @@ window.onload = function(){
 
         //船の沈没処理の関数
         sinkShip: function() {
-            this.player.controller.sndManager.playFX(sndSinkShip);
-            this.player.removeFune(this);
-            this.counter = 1;
+            this.counter = 1;	//アニメーションフレームのカウンター
+            //やられ時のアニメーションフレームをセットする
             this.fune.frame = this.fune.sinkFrame;
-            this.onenterframe = function(){ // enterframe event listener
-                this.counter++;
-                if (this.counter == 12 ) {
-                    this.parentNode.removeChild(this);
-                }
-            };
-        }
-    });
 
-    /**
-     * 船の種類
-     */
-    //ベース船のクラスを継承して、必要な部分を上書きする
-    //キャプテン船
-    var CaptainFune = Class.create(BaseFune, {
-        initialize: function(id) {
-            BaseFune.call(this, id, {
-                movement:  4,
-                range:     3,
-                attack:  100,
-                defense:  50,
-                hpMax:   120,
-                speed:	5
-            });
-           	//アニメ設定           
-            this.fune.frame = [0, 0, 0, 0, 1, 1, 1, 2, 2, 1, 1, 0, 0, 0, 0, 3, 3, 3];
-            this.fune.sinkFrame = [3, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, null];
-        },
-
-        getCaptainName: function() {
-            return "キャプテン";
-        },
-
-        getSkillName: function() {
-            return "オウエン";
-        },
-
-        processSkill: function(onEnd) {
-            var count = this.player.getFuneCount();
-            for(var i=0; i < count; i++) {
-                var fune = this.player.getFune(i);
-                var toHeal = Math.ceil(fune.getHPMax() /2);
-                fune.healDamage(toHeal);
-            }
-            onEnd();
-        },
-
-        //やられ処理の関数を上書きする
-        sinkShip: function() {
-            this.player.controller.sndManager.playFX(sndSinkShip);
-            //隊長の生存フラグを下ろし、ターン終了の関数で負けにする
-            this.player.leaderLiving = false;
-            
-            this.player.removeFune(this);
-            this.counter = 1;
-            this.fune.frame = this.fune.sinkFrame;
-            this.onenterframe = function(){ // enterframe event listener
-                this.counter++;
-                if (this.counter == 12 ) {
-                    this.parentNode.removeChild(this);
-                }
-            };
-        }
-
-    });
-
-    //プレイヤー兵1(チーフ)。隊長であり、やられると負けとなる
-    var Player01 = Class.create(BaseFune, {
-    	initialize: function(id) {
-        	//@mod 2015.0527 T.Masuda ステータスを調整しました。リーダーとして優秀なステータスを設定しました。
-    		BaseFune.call(this, id, {
-    			movement:  4,
-    			range:     3,
-    			attack:  100,
-    			defense:  70,
-    			hpMax:   120,
-    			speed:	8
-    		});
-
-    		//高さを変更する
-    		this.fune.height = HIGH_TIP_HEIGHT;
-    		//幅を変更する
-    		this.fune.width = TIP_LENGTH;
-    		
-    		//Y座標補正用メンバを追加する
-    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
-    		
-    		//プレイヤー1兵のスプライトシートを使う
-    		this.fune.image = game.assets[player01]; 
-    		//アニメ設定           
-    		this.fune.frame = TO_SIDE_FRAME.player01;
-    		this.fune.sinkFrame = SINK_FRAME.player01;
-    	},
-    	
-    	getCaptainName: function() {
-    		return "チーフ";
-    	},
-    	
-        /*
-         * 関数名:getUnitName
-         * 引数  :なし
-         * 戻り値:String:ユニット名を返す
-         * 概要  :ユニット名の文字列を返す
-         * 作成日:2015.05.26
-         * 作成者:T.M
-         */
-    	getUnitName: function() {
-    		//ユニット名を返す
-    		return "player01";
-    	},
-    	
-    	getSkillName: function() {
-    		return "応急手当";
-    	},
-    	
-    	processSkill: function(onEnd) {
-    		var count = this.player.getFuneCount();
-    		for(var i=0; i < count; i++) {
-    			var fune = this.player.getFune(i);
-    			var toHeal = Math.ceil(fune.getHPMax() /2);
-    			fune.healDamage(toHeal);
-    		}
-    		onEnd();
-    	},
-    	
-    	//やられ処理の関数を上書きする
-    	sinkShip: function() {
-    		this.player.controller.sndManager.playFX(sndSinkShip);
-    		//隊長の生存フラグを下ろし、ターン終了の関数で負けにする
-    		this.player.leaderLiving = false;
-    		
-    		this.player.removeFune(this);
-    		this.counter = 1;
-    		this.fune.frame = this.fune.sinkFrame;
-    		this.onenterframe = function(){ // enterframe event listener
-    			            this.counter++;
-    			if (this.counter == 12 ) {
-    				this.parentNode.removeChild(this);
-    			}
-    			    };
-    	}
-    	
-    });
-
-    //プレイヤー兵2。複数存在する
-    var Player02 = Class.create(BaseFune, {
-    	//@mod 2015.0527 T.Masuda ステータスを調整しました。一兵卒ステータスにしました
-    	initialize: function(id) {
-    		BaseFune.call(this, id, {
-    			movement:  3,
-    			range:     3,
-    			attack:  80,
-    			defense:  50,
-    			hpMax:   100,
-    			speed:	4
-    		});
- 
-    		
-    		//高さを変更する
-    		this.fune.height = HIGH_TIP_HEIGHT;
-    		//幅を変更する
-    		this.fune.width = TIP_LENGTH;
-    		
-    		//Y座標補正用メンバを追加する
-    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
-    		
-    		//プレイヤー2兵のスプライトシートを使う
-    		this.fune.image = game.assets[player02]; 
-    		//アニメ設定           
-    		this.fune.frame = TO_SIDE_FRAME.player01;
-    		this.fune.sinkFrame = SINK_FRAME.player01;
-    	},
-    	
-    	getCaptainName: function() {
-    		return "隊員";
-    	},
-
-        /*
-         * 関数名:getUnitName
-         * 引数  :なし
-         * 戻り値:String:ユニット名を返す
-         * 概要  :ユニット名の文字列を返す
-         * 作成日:2015.05.26
-         * 作成者:T.M
-         */
-    	getUnitName: function() {
-    		//ユニット名を返す
-    		return "player02";
-    	},
-    	
-    	getSkillName: function() {
-    		return "バレットフィーバー";
-    	},
-    	
-    	processSkill: function(onEnd) {
-    		var damage = this.stats.attack;
-    		var count = this.player.controller.getNonActivePlayer().getFuneCount();
-    		for(var i=0; i < count; i++) {
-    			var fune = this.player.controller.getNonActivePlayer().getFune(i);
-    			if (this.withinRange(fune.i, fune.j)) {
-    				var afterHp = fune.takeDamage(damage);
-    				var explosion = new Explosion();
-    				explosion.x = fune.x +32;
-    				explosion.y = fune.y +32;
-    				this.player.controller.sndManager.playFX(sndExplosion);
-    				game.currentScene.addChild(explosion);
-    				
-    				if (afterHp <= 0) {
-    					fune.sinkShip();
-    				}
-    			}
-    		}
-    		onEnd();
-    	},
-    });    
-    
-    //敵兵01クラス
-    var Enemy01 = Class.create(BaseFune, {
-    	//@mod 2015.0527 T.Masuda ステータスを調整しました。攻撃寄りです
-        initialize: function(id) {
-            BaseFune.call(this, id, {
-                movement:  4,
-                range:     3,
-                attack:   65,
-                defense:  45,
-                hpMax:    55,
-                speed:	6
-            });
-
-    		//高さを変更する
-    		this.fune.height = HIGH_TIP_HEIGHT;
-    		//幅を変更する
-    		this.fune.width = TIP_LENGTH;
-    		
-    		//Y座標補正用メンバを追加する
-    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
-    		
-    		//敵兵01のスプライトシートを使う
-    		this.fune.image = game.assets[enemy01]; 
-    		//アニメ設定           
-    		this.fune.frame = TO_SIDE_FRAME.player01;
-    		this.fune.sinkFrame = SINK_FRAME.player01;
-        },
-
-        getCaptainName: function() {
-            return "警備兵";
-        },
-
-        /*
-         * 関数名:getUnitName
-         * 引数  :なし
-         * 戻り値:String:ユニット名を返す
-         * 概要  :ユニット名の文字列を返す
-         * 作成日:2015.05.26
-         * 作成者:T.M
-         */
-    	getUnitName: function() {
-    		//ユニット名を返す
-    		return "enemy01";
-    	},
-        
-        getSkillName: function() {
-            return "ガッツ";
-        },
-
-        processSkill: function(onEnd) {
-            this.stats.attack  += 10;
-            this.stats.defense += 10;
-            onEnd();
-        },
-    });
-
-    //敵兵02クラス
-    var Enemy02 = Class.create(BaseFune, {
-    	initialize: function(id) {
-        	//@mod 2015.0527 T.Masuda ステータスを調整しました。防御寄りです
-    		BaseFune.call(this, id, {
-    			movement:  4,
-    			range:     4,
-    			attack:   50,
-    			defense:  60,
-    			hpMax:    80,
-    			speed:	2
-    		});
-    		
-    		//高さを変更する
-    		this.fune.height = HIGH_TIP_HEIGHT;
-    		//幅を変更する
-    		this.fune.width = TIP_LENGTH;
-    		
-    		//Y座標補正用メンバを追加する
-    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
-    		
-    		//敵兵01のスプライトシートを使う
-    		this.fune.image = game.assets[enemy02]; 
-    		//アニメ設定           
-    		this.fune.frame = TO_SIDE_FRAME.player01;
-    		this.fune.sinkFrame = SINK_FRAME.player01;
-    	},
-    	
-    	getCaptainName: function() {
-    		return "警備兵";
-    	},
-    	
-    	/*
-    	 * 関数名:getUnitName
-    	 * 引数  :なし
-    	 * 戻り値:String:ユニット名を返す
-    	 * 概要  :ユニット名の文字列を返す
-    	 * 作成日:2015.05.26
-    	 * 作成者:T.M
-    	 */
-    	getUnitName: function() {
-    		//ユニット名を返す
-    		return "enemy02";
-    	},
-    	
-    	getSkillName: function() {
-    		return "ガッツ";
-    	},
-    	
-    	processSkill: function(onEnd) {
-    		this.stats.attack  += 10;
-    		this.stats.defense += 10;
-    		onEnd();
-    	},
-    });
-    
-    //敵兵03クラス
-    var Enemy03 = Class.create(BaseFune, {
-    	initialize: function(id) {
-        //@mod 2015.0527 T.Masuda ステータスを調整しました。スピード寄りです
-   		BaseFune.call(this, id, {
-    			movement:  6,
-    			range:     2,
-    			attack:   50,
-    			defense:  30,
-    			hpMax:    60,
-    			speed:	7
-    		});
-    		
-    		//高さを変更する
-    		this.fune.height = HIGH_TIP_HEIGHT;
-    		//幅を変更する
-    		this.fune.width = TIP_LENGTH;
-    		
-    		//Y座標補正用メンバを追加する
-    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
-    		
-    		//敵兵01のスプライトシートを使う
-    		this.fune.image = game.assets[enemy03]; 
-    		//アニメ設定           
-    		this.fune.frame = TO_SIDE_FRAME.player01;
-    		this.fune.sinkFrame = SINK_FRAME.player01;
-    	},
-    	
-    	getCaptainName: function() {
-    		return "警備兵";
-    	},
-    	
-    	/*
-    	 * 関数名:getUnitName
-    	 * 引数  :なし
-    	 * 戻り値:String:ユニット名を返す
-    	 * 概要  :ユニット名の文字列を返す
-    	 * 作成日:2015.05.26
-    	 * 作成者:T.M
-    	 */
-    	getUnitName: function() {
-    		//ユニット名を返す
-    		return "enemy03";
-    	},
-    	
-    	getSkillName: function() {
-    		return "ガッツ";
-    	},
-    	
-    	processSkill: function(onEnd) {
-    		this.stats.attack  += 10;
-    		this.stats.defense += 10;
-    		onEnd();
-    	},
-    });
-    
-    //敵兵04クラス。生体兵器(ゾンビのようなモンスター)
-    var Enemey04 = Class.create(BaseFune, {
-    	initialize: function(id) {
-    		//@mod 2015.0527 ステータスを調整しました。近接型のパラメータです。
-    		BaseFune.call(this, id, {
-    			movement:  7,
-    			range:     1,
-    			attack:   70,
-    			defense:  60,
-    			hpMax:    100,
-    			speed:	7
-    		});
-    		
-    		//高さを変更する
-    		this.fune.height = HIGH_TIP_HEIGHT;
-    		//幅を変更する
-    		this.fune.width = TIP_LENGTH;
-    		
-    		//Y座標補正用メンバを追加する
-    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
-    		
-    		//敵兵01のスプライトシートを使う
-    		this.fune.image = game.assets[enemy03]; 
-    		//アニメ設定           
-    		this.fune.frame = TO_SIDE_FRAME.player01;
-    		this.fune.sinkFrame = SINK_FRAME.player01;
-    	},
-    	
-    	getCaptainName: function() {
-    		return "生体兵器";
-    	},
-    	
-    	/*
-    	 * 関数名:getUnitName
-    	 * 引数  :なし
-    	 * 戻り値:String:ユニット名を返す
-    	 * 概要  :ユニット名の文字列を返す
-    	 * 作成日:2015.05.26
-    	 * 作成者:T.M
-    	 */
-    	getUnitName: function() {
-    		//ユニット名を返す
-    		return "enemy04";
-    	},
-
-    	//@mod 2015.0527 T.Masuda スキル名を変えました
-    	getSkillName: function() {
-    		return "強襲";
-    	},
-    	
-    	//@mod 2015.0527 T.Masuda スキルで上昇するパラメータを攻撃力と防御力から、攻撃力と移動力に変えました
-    	processSkill: function(onEnd) {
-    		this.stats.attack  += 10;
-    		this.stats.movement += 2;
-    		onEnd();
-    	},
-    });
-    
-    //速い船
-    var HayaiFune = Class.create(BaseFune, {
-        initialize: function(id) {
-            BaseFune.call(this, id, {
-                movement:  5,
-                range:     3,
-                attack:   80,
-                defense:  60,
-                hpMax:    80,
-                speed:	10
-            });
-
-            this.moveType   = "light";
-            this.fune.frame = [8, 8, 8, 8, 9, 9, 9, 10, 10, 9, 9, 8, 8, 8, 8, 11, 11, 11];
-            this.fune.sinkFrame = [11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, null];
-        },
-
-        getCaptainName: function() {
-            return "はやいちゃん";
-        },
-
-        getSkillName: function() {
-            return "ハリーアップ";
-        },
-
-        processSkill: function(onEnd) {
-            this.player.controller.getFreeTurns(this.player, 2);
-            onEnd();
-        },
-    });
-
-    //固い船
-    var KataiFune = Class.create(BaseFune, {
-        initialize: function(id) {
-            BaseFune.call(this, id, {
-                movement:  3,
-                range:     3,
-                attack:   80,
-                defense:  60,
-                hpMax:   240,
-                speed:	2
-            });
-
-            this.moveType   = "heavy";
-            this.fune.frame = [16, 16, 16, 16, 17, 17, 17, 18, 18, 17, 17, 16, 16, 16, 16, 19, 19, 19];
-            this.fune.sinkFrame = [19, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23, null];
-            this.indestructible = false;
-        },
-
-        getCaptainName: function() {
-            return "かたいちゃん";
-        },
-
-        getSkillName: function() {
-            return "アイロンシールド";
-        },
-
-        processSkill: function(onEnd) {
-            this.indestructible = true;
-            onEnd();
-        },
-
-        attackFune: function(otherFune) {
-            this.indestructible = false;
-            BaseFune.prototype.attackFune.call(this, otherFune);
-        },
-
-        takeDamage: function(damage) {
-            if (this.indestructible) {
-                this.indestructible = false
-                return this.getHP()
+            //@add 2015.0531 T.Masuda ステージクリア時の残存兵力処理のための記述を追加
+            //残った兵士は静かに消えるように変更
+            //リーダーが生存しているなら
+            if(this.player.leaderLiving){
+            	//やられ音を鳴らす
+            	this.player.controller.sndManager.playFX(sndSinkShip);
+            	//転倒させる
+            	this.fune.originX = this.fune.width / 2;
+            	this.fune.originY = this.fune.height -6;
+            	this.fune.rotate(90);
+            //リーダーやられ時の残存兵力掃除処理なら
             } else {
-                return BaseFune.prototype.takeDamage.call(this, damage);
+            	//透明にする。やられ音はならさない
+            	this.fune.opacity = 0;
             }
-        },
-    });
-
-    //攻撃タイプの船
-    var KougekiFune = Class.create(BaseFune, {
-        initialize: function(id) {
-            BaseFune.call(this, id, {
-                movement:  3,
-                range:     3,
-                attack:  120,
-                defense:  40,
-                hpMax:   150,
-                speed:	4
-            });
-
-            this.fune.frame = [24, 24, 24, 24, 25, 25, 25, 26, 26, 25, 25, 24, 24, 24, 24, 27, 27, 27];
-            this.fune.sinkFrame = [27, 27, 27, 28, 28, 29, 29, 30, 30, 31, 31, null];
-        },
-
-        getCaptainName: function() {
-            return "こうげきちゃん";
-        },
-
-        getSkillName: function() {
-            return "バレットストーム";
-        },
-
-        processSkill: function(onEnd) {
-            var damage = this.stats.attack;
-            var count = this.player.controller.getNonActivePlayer().getFuneCount();
-            for(var i=0; i < count; i++) {
-                var fune = this.player.controller.getNonActivePlayer().getFune(i);
-                if (this.withinRange(fune.i, fune.j)) {
-                    var afterHp = fune.takeDamage(damage);
-                    var explosion = new Explosion();
-                    explosion.x = fune.x +32;
-                    explosion.y = fune.y +32;
-                    this.player.controller.sndManager.playFX(sndExplosion);
-                    game.currentScene.addChild(explosion);
-
-                    if (afterHp <= 0) {
-                        fune.sinkShip();
-                    }
+            //ユニットのやられ処理を行う
+            this.player.removeFune(this);
+            
+            
+            this.onenterframe = function(){ // enterframe event listener
+                this.counter++;
+                if (this.counter == 12 ) {
+                    this.parentNode.removeChild(this);
                 }
-            }
-            onEnd();
-        },
+            };
+        }
     });
 
-
-    
-    //敵の船の基底クラス
-    var TekiFune = Class.create(BaseFune, {
-        initialize: function(id) {
-            BaseFune.call(this, id, {
-                movement:  4,
-                range:     3,
-                attack:   50,
-                defense:  40,
-                hpMax:    50,
-                speed:	3
-            });
-
-            this.moveType   = "light";
-            this.fune.frame = [32, 32, 32, 32, 33, 33, 34, 34, 34, 33, 33, 32, 32, 32, 32, 35, 35, 35];
-            this.fune.sinkFrame = [35, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, null];
-        },
-
-        getCaptainName: function() {
-            return "テシタちゃん";
-        },
-
-        getSkillName: function() {
-            return "パワーアップ";
-        },
-
-        processSkill: function(onEnd) {
-            this.stats.attack  += 10;
-            this.stats.defense += 10;
-            onEnd();
-        },
-    });
-
-    //ボス船
-    var BossFune = Class.create(KougekiFune, {
-        initialize: function(id) {
-            KougekiFune.call(this, id);
-
-            this.stats.hpMax = 200;
-            this.stats.hp    = this.stats.hpMax;
-
-            this.moveType   = "normal";
-            this.fune.frame = [40, 40, 40, 40, 41, 41, 41, 42, 42, 41, 41, 40, 40, 40, 40, 43, 43, 43];
-            this.fune.sinkFrame = [43, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, null];
-        },
-
-        getCaptainName: function() {
-            return "ボス";
-        },
-
-        getSkillName: function() {
-            return "カミワザ";
-        },
-
-        processSkill: function(onEnd) {
-            var count = this.player.getFuneCount();
-            for(var i=0; i < count; i++) {
-                var fune = this.player.getFune(i);
-                var toHeal = Math.ceil(fune.getHPMax() /4);
-                fune.healDamage(toHeal);
-            }
-
-            KougekiFune.prototype.processSkill.call(this, onEnd);
-        },
-    });
-
-    var BossTeki = Class.create(CaptainFune, {
-        initialize: function(id) {
-            CaptainFune.call(this, id);
-
-            this.fune.frame = [32, 32, 32, 32, 33, 33, 33, 34, 34, 33, 33, 32, 32, 32, 32, 35, 35, 35];
-            this.fune.sinkFrame = [35, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, null];
-        },
-
-        getCaptainName: function() {
-            return "ボスちゃん";
-        },
-
-        processSkill: function(onEnd) {
-            this.stats.attack  += 10;
-            this.stats.defense += 10;
-            onEnd();
-        },
-    });
-
-    var HayaiTeki = Class.create(HayaiFune, {
-        initialize: function(id) {
-            HayaiFune.call(this, id);
-
-            this.stats.hpMax = Math.floor(0.5 * this.stats.hpMax);
-            this.stats.hp = this.stats.hpMax;
-
-            this.fune.frame = [40, 40, 40, 40, 41, 41, 41, 42, 42, 41, 41, 40, 40, 40, 40, 43, 43, 43];
-            this.fune.sinkFrame = [43, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, null];
-        },
-
-        getCaptainName: function() {
-            return "ハヤイくん";
-        },
-    });
-
-    var KataiTeki = Class.create(KataiFune, {
-        initialize: function(id) {
-            KataiFune.call(this, id);
-
-            this.stats.hpMax = Math.floor(0.5 * this.stats.hpMax);
-            this.stats.hp = this.stats.hpMax;
-
-            this.fune.frame = [48, 48, 48, 48, 49, 49, 49, 50, 50, 49, 49, 48, 48, 48, 48, 51, 51, 51];
-            this.fune.sinkFrame = [51, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, null];
-        },
-
-        getCaptainName: function() {
-            return "カタイくん";
-        },
-    });
-
-    var KougekiTeki = Class.create(KougekiFune, {
-        initialize: function(id) {
-            KougekiFune.call(this, id);
-
-            this.stats.hpMax = Math.floor(0.5 * this.stats.hpMax);
-            this.stats.hp = this.stats.hpMax;
-
-            this.fune.frame = [56, 56, 56, 56, 57, 57, 57, 58, 58, 57, 57, 56, 56, 56, 56, 59, 59, 59];
-            this.fune.sinkFrame = [59, 59, 59, 60, 60, 61, 61, 62, 62, 63, 63, null];
-        },
-
-        getCaptainName: function() {
-            return "コウゲキくん";
-        },
-    });    
     
     //爆発アニメ
     var Explosion = Class.create(Sprite, {
         initialize: function(id, stats) {
-            Sprite.call(this, 32, 32);
+        	//@mod 2015.0529 T.Masuda 高さ、幅の値をキャラチップ幅の定数に置き換えました
+            Sprite.call(this, TIP_LENGTH, TIP_LENGTH);
 
             this.image = game.assets[explosionSpriteSheet];
-            this.frame = [0,1,2,3,1,2,3,4,null];
+            //@mod 2015.0529 T.Masuda アニメーションが爆発から銃撃に変わったため、アニメーションフレームを調整しました
+            this.frame = [0,1,2,3,4,5,6,7, 8, 9, null];
 
             this.counter = 0;
         },
         onenterframe:function(){ // enterframe event listener
             this.counter++;
-            if (this.counter == 9 ) {
+			//@mod 2015.0529 T.Masuda 銃撃のフレーム数に合わせてカウンターの条件の値を変えました
+            if (this.counter == 10 ) {
                 this.parentNode.removeChild(this);
             }
         },
@@ -2305,53 +1637,40 @@ window.onload = function(){
 
         //船データを削除する関数
         removeFune: function(fune) {
-            
+        	//@add 2015.0529 T.Masuda filter関数内でのGameManagerの参照を行うため、参照を変数に保存する
+            var gm = this.manager;	
             //@mod 2015.0527 T.Masuda filter関数を使って配列を作成するようにしました
         	//行動順リストを取得する
         	var turnList = this.manager.turnList;
-       	
+        	var self = this;	//コールバック関数内でのthisの参照変更への対処
             //ユニットのリストを更新するため、配列を生成する
             var newList = turnList.filter(function(v, i) {
-            	//削除対象のユニットが現在の行動順より後ろであれば
-            	if( v.unit === fune && i >= this.activeUnit){
-	    			//行動順がずれるので、行動順の数値を修正する
-	    			this.activeUnit -= 1;
-        		}
-            	  return (v.unit !== fune);	//やられたユニットを除外する
+            	//@mod 2015.05.29 T.Masuda 未行動のユニットがやられた場合の処理
+            	//やられたユニットが未行動であったら
+            	if(v.unit === fune && gm.activeUnit >= i){
+            		gm.activeUnit--;	//行動順を1つ下げて適正にする
+            	}
+            	return (v.unit !== fune);	//やられたユニットを除外する
             });
-            //ユニットの数を数えるループ
-//            for (var i=0; i < this.getFuneCount(); ++i) {
-//            	//ユニットを取得し、それがやられたユニットでなければ
-//                if (this.getFune(i) != fune) {
-//                	//ユニットリストに該当するユニットを登録する
-//                    newList.push(this.getFune(i));
-//                }
-//            }
-//            //プレイヤーのユニットのリストを更新する
-//            this.funeList = newList;
-//
-//            //@mod 2015.0522 T.Masuda 行動順リストからやられたユニットを削除する記述を追加しました
-//            //行動順リストを取得する
-//            var turnList = this.manager.turnList;
-//            //やられたユニットを見つけるループを開始する
-//            
-//            for(var i = 0; i < turnList.length; i++){
-//            	//ユニットが見つかったら
-//            	if(fune === turnList[i]["unit"]){
-//            		//該当するインデックス(=ユニットの連想配列)を削除する
-//            		delete turnList[i];
-//            		//削除するユニットが行動後であれば
-//            		if(i >= this.activeUnit){
-//            			//行動順がずれるので、行動順の数値を修正する
-//            			this.activeUnit -= 1;
-//            		}
-//            	}
-//            }
-            //ここまで変更しました
 
             //@mod 2015.0527 T.Masuda コードの位置を変更しました。この関数の最初の行からこの位置へ移動しました。
             //delete fune.player;
-            this.manager.turnList = newList;
+            gm.turnList = newList;
+            
+            delete fune.player;
+
+            var newUnitList = [];
+            for (var i=0; i < this.getFuneCount(); ++i) {
+                if (this.getFune(i) != fune) {
+                	newUnitList.push(this.getFune(i));
+                }
+            }
+            this.funeList = newUnitList;
+
+            gm.turnList = newList;
+            
+            //@mod 2015.0527 T.Masuda コードの位置を変更しました。この関数の最初の行からこの位置へ移動しました。
+            delete fune.player;
             //やられたユニットがアクティブであれば
             if (this.activeFune == fune) {
             	//ユニットのアクティブ判定をnullにする
@@ -2427,8 +1746,36 @@ window.onload = function(){
                     case "move":
                         if (action.path && action.path.length > 0) {
                             self.controller.map.moveFune(action.fune, action.path, function() {
-                                self.controller.endTurn();
-                            })
+                            	//@mod 2015.0531 T.Masuda 移動後の攻撃の処理を追加しました
+                                //周囲の敵をサーチする。敵側のユニット数をまずは取得する
+                                var count = self.controller.getNonActivePlayer().getFuneCount();
+                                var isAttacked = false;	//攻撃を行ったかどうかを示す変数を用意する
+                                var unit = action.fune;	//現在行動中のユニットを変数に入れる
+                            	//移動を終えたユニットの移動力を一時的に0にする
+                            	unit.stats.movement = 0;
+                            	//ユニットの座標を確定させる
+                            	self.controller.map.positonObject(unit, unit.i, unit.j);
+                                //敵ユニットを走査する
+                                for(var i=0; i < count; i++) {
+                                	//敵のユニット情報を取得する
+                                    var targetFune = self.controller.getNonActivePlayer().getFune(i);
+                                    //敵ユニットが射程圏内なら
+                                    if (action.fune.withinRange(targetFune.i, targetFune.j)) {
+                                    	//攻撃を行い、ターンを終える
+                                    	action.fune.attackFune(targetFune);
+                                    	isAttacked = true;	//攻撃フラグをオンにする
+                                    	//敵攻撃処理を終える
+                                    	break;
+                                    }
+                                }
+                                //攻撃を行っていなければ
+                                if(!isAttacked){
+                                	//ターンを終える
+                                	self.controller.endTurn();
+                                }
+                                //移動力を元に戻す
+                            	unit.stats.movement = unit.getMovementReserved();
+                           });
                         } else {
                             self.controller.endTurn();
                         }
@@ -2450,9 +1797,11 @@ window.onload = function(){
 
         chooseAction: function() {
             // Choose randomly
+        	//@mod 2015.0531 T.masuda 取得する船をターンリストから取ってくるように変更しました
             var maxFuneIndex = this.player.getFuneCount();
-            var funeIndex    = Math.floor(Math.random() * maxFuneIndex);
-            var fune         = this.player.getFune(funeIndex);
+           // var funeIndex    = Math.floor(Math.random() * maxFuneIndex);
+            //getRandomFuneで現在のユニットを取得する
+            var fune         = this.getRandomFune();
 
             // Use skill randomly
             if (fune.canUseSkill() && Math.random() < 0.1) {
@@ -2490,10 +1839,12 @@ window.onload = function(){
         },
 
         getRandomFune: function() {
-            var maxFuneIndex = this.player.getFuneCount();
-            var funeIndex    = Math.floor(Math.random() * maxFuneIndex);
-            var fune         = this.player.getFune(funeIndex);
-            return fune;
+            //@mod 2015.0529 T.Masuda ランダムでユニットを取得しないようにしました。
+//            var maxFuneIndex = this.player.getFuneCount();
+//            var funeIndex    = Math.floor(Math.random() * maxFuneIndex);
+//            var fune         = this.player.getFune(funeIndex);
+        	//行動順リストからユニットを返します
+            return this.player.controller.turnList[this.player.controller.activeUnit].unit;
         },
 
         getTargetsWithinRange: function(fune) {
@@ -2567,7 +1918,7 @@ window.onload = function(){
 
         testSkillUseInCombat: function(fune) {
             if (fune.canUseSkill()) {
-                if (fune instanceof CaptainFune) {
+                if (fune instanceof Enemy01) {
                     // Should Captain Heal ships?
                     var count = this.player.getFuneCount();
                     var woundedCount = 0;
@@ -2583,7 +1934,7 @@ window.onload = function(){
                             fune: fune,
                         }
                     }
-                } else if (fune instanceof KougekiFune) {
+                } else if (fune instanceof Player01) {
                     // Should kougeki use attack skill
                     var targetCount = 0;
                     // look for attack targets
@@ -2634,7 +1985,7 @@ window.onload = function(){
             var fune         = this.getRandomFune();
 
             // Skill
-            if (fune instanceof KataiFune) {
+            if (fune instanceof Enemy01 == false) {
                 if (fune.canUseSkill() && Math.random() < 0.3) {
                     console.log("AI use skill", fune.getCaptainName(), fune.getSkillName());
                     return {
@@ -2693,7 +2044,7 @@ window.onload = function(){
         chooseAction: function() {
             var count = this.player.getFuneCount();
             for(var i=0; i < count; i++) {
-                var fune = this.player.getFune(i);
+                var fune = this.getRandomFune();
 
                 // skill を使う
                 var skillUse = this.testSkillUseInCombat(fune);
@@ -2715,7 +2066,7 @@ window.onload = function(){
                         }
                     }
                 }
-
+                
                 //wounded ships try to escape
                 if (fune.getHP() < (fune.getHPMax() * 0.5) ) {
                     if (Math.random() < 0.3) {
@@ -2733,18 +2084,51 @@ window.onload = function(){
                     }
                 }
             }
+            
             // If no actions taken then move randomly
             var fune = this.getRandomFune();
-            var path = this.getRandomPath(fune, 0.5);
-            if (path == null) {
-                console.log("AI no safe path");
-                path = this.getRandomPath(fune, 0.0);
+            
+            var openOnly = true;
+            var moveList = this.player.controller.map.getMovementRange(fune, openOnly);
+            var attackablePosition = [];
+            //敵ユニットが攻撃可能範囲にいるかを調べる
+            for(var i = 0; i < this.player.controller.getNonActivePlayer().getFuneCount(); i++){
+            	//敵ユニットを取得する
+            	var targetUnit = this.player.controller.getNonActivePlayer().getFune(i);
+				//移動可能リストを走査する 
+				for(var j = 0; j < moveList.length; j++){
+					//敵を攻撃可能な座標なら
+					if(fune.withinRangeWithMove(moveList[j].i,moveList[j].j, targetUnit)){
+						//攻撃可能座標リストに追加する
+						attackablePosition.push(moveList[j]);
+					}
+				}
+			}
+            
+            //経路データを格納する変数を宣言する
+            var path     = null;
+            //攻撃可能な座標があったら
+            if(attackablePosition.length){
+            	//候補からランダムに選出するための乱数を取得する
+	            var randomIndex = Math.floor(Math.random() * attackablePosition.length);
+	            //行き先の座標を確定する
+	            var targetPosition = attackablePosition[randomIndex];
+	            //経路データを取得する
+	            path     = this.player.controller.map.getPath(fune, fune.i, fune.j, targetPosition.i, targetPosition.j);
+            } else {
+            	//ランダムな経路を取得する
+            	path = this.getRandomPath(fune, 0.5);
+            	if (path == null) {
+            		console.log("AI no safe path");
+            		path = this.getRandomPath(fune, 0.0);
+            	}
+            	console.log("AI random move", fune.getCaptainName());
             }
-            console.log("AI random move", fune.getCaptainName());
+            //行動データを返す
             return {
-                type:"move",
-                fune: fune,
-                path: path,
+            	type:"move",
+            	fune: fune,
+            	path: path,
             }
         },
     });
@@ -2762,9 +2146,9 @@ window.onload = function(){
 
         chooseAction: function() {
             var count = this.player.getFuneCount();
+            //ターンがきているユニットを動かす
+            var fune = this.getRandomFune();
             for(var i=0; i < count; i++) {
-                var fune = this.player.getFune(i);
-
                 // skill を使う
                 var skillUse = this.testSkillUseInCombat(fune);
                 if (skillUse) {
@@ -2786,18 +2170,48 @@ window.onload = function(){
                     }
                 }
             }
-            // If no actions taken then move randomly
-            var fune = this.getRandomFune();
-            var path = this.getRandomPath(fune, 0.5);
-            if (path == null) {
-                console.log("AI no safe path");
-                path = this.getRandomPath(fune, 0.0);
+            
+            var openOnly = true;
+            var moveList = this.player.controller.map.getMovementRange(fune, openOnly);
+            var attackablePosition = [];
+            //敵ユニットが攻撃可能範囲にいるかを調べる
+            for(var i = 0; i < this.player.controller.getNonActivePlayer().getFuneCount(); i++){
+            	//敵ユニットを取得する
+            	var targetUnit = this.player.controller.getNonActivePlayer().getFune(i);
+				//移動可能リストを走査する 
+				for(var j = 0; j < moveList.length; j++){
+					//敵を攻撃可能な座標なら
+					if(fune.withinRangeWithMove(moveList[j].i,moveList[j].j, targetUnit)){
+						//攻撃可能座標リストに追加する
+						attackablePosition.push(moveList[j]);
+					}
+				}
+			}
+            
+            //経路データを格納する変数を宣言する
+            var path     = null;
+            //攻撃可能な座標があったら
+            if(attackablePosition.length){
+            	//候補からランダムに選出するための乱数を取得する
+	            var randomIndex = Math.floor(Math.random() * attackablePosition.length);
+	            //行き先の座標を確定する
+	            var targetPosition = attackablePosition[randomIndex];
+	            //経路データを取得する
+	            path     = this.player.controller.map.getPath(fune, fune.i, fune.j, targetPosition.i, targetPosition.j);
+            } else {
+            	//ランダムな経路を取得する
+            	path = this.getRandomPath(fune, 0.5);
+            	if (path == null) {
+            		console.log("AI no safe path");
+            		path = this.getRandomPath(fune, 0.0);
+            	}
+            	console.log("AI random move", fune.getCaptainName());
             }
-            console.log("AI random move", fune.getCaptainName());
+            //行動データを返す
             return {
-                type:"move",
-                fune: fune,
-                path: path,
+            	type:"move",
+            	fune: fune,
+            	path: path,
             }
         },
     });
@@ -2816,7 +2230,7 @@ window.onload = function(){
         chooseAction: function() {
             var count = this.player.getFuneCount();
             for(var i=0; i < count; i++) {
-                var fune = this.player.getFune(i);
+                var fune = this.getRandomFune();
 
                 //wounded ships try to escape
                 if (fune.getHP() < (fune.getHPMax() * 0.5) ) {
@@ -2856,18 +2270,50 @@ window.onload = function(){
                     }
                 }
             }
+            
             // If no actions taken then move randomly
             var fune = this.getRandomFune();
-            var path = this.getRandomPath(fune, 0.8);
-            if (path == null) {
-                console.log("AI no safe path");
-                path = this.getRandomPath(fune, 0.0);
+            var openOnly = true;
+            var moveList = this.player.controller.map.getMovementRange(fune, openOnly);
+            var attackablePosition = [];
+            //敵ユニットが攻撃可能範囲にいるかを調べる
+            for(var i = 0; i < this.player.controller.getNonActivePlayer().getFuneCount(); i++){
+            	//敵ユニットを取得する
+            	var targetUnit = this.player.controller.getNonActivePlayer().getFune(i);
+				//移動可能リストを走査する 
+				for(var j = 0; j < moveList.length; j++){
+					//敵を攻撃可能な座標なら
+					if(fune.withinRangeWithMove(moveList[j].i,moveList[j].j, targetUnit)){
+						//攻撃可能座標リストに追加する
+						attackablePosition.push(moveList[j]);
+					}
+				}
+			}
+            
+            //経路データを格納する変数を宣言する
+            var path     = null;
+            //攻撃可能な座標があったら
+            if(attackablePosition.length){
+            	//候補からランダムに選出するための乱数を取得する
+	            var randomIndex = Math.floor(Math.random() * attackablePosition.length);
+	            //行き先の座標を確定する
+	            var targetPosition = attackablePosition[randomIndex];
+	            //経路データを取得する
+	            path     = this.player.controller.map.getPath(fune, fune.i, fune.j, targetPosition.i, targetPosition.j);
+            } else {
+            	//ランダムな経路を取得する
+            	path = this.getRandomPath(fune, 0.5);
+            	if (path == null) {
+            		console.log("AI no safe path");
+            		path = this.getRandomPath(fune, 0.0);
+            	}
+            	console.log("AI random move", fune.getCaptainName());
             }
-            console.log("AI random move", fune.getCaptainName());
+            //行動データを返す
             return {
-                type:"move",
-                fune: fune,
-                path: path,
+            	type:"move",
+            	fune: fune,
+            	path: path,
             }
         },
     });
@@ -2944,56 +2390,6 @@ window.onload = function(){
             return funeList;
         },
 
-        //対戦プレイを開始する関数
-        beginVersusGame: function(opponent) {
-            this.mode = "versus";
-
-            // 船の初期の位置
-            var startPositions = {
-                player1: [
-                    {i: 0, j: 8}, {i: 0, j: 6}, {i: 1, j: 7}, {i: 2, j: 8}
-                ],
-                player2: [
-                    {i: 12, j: 0}, {i: 10, j: 0}, {i: 11, j: 1}, {i: 12, j: 2}
-                ],
-            }
-            this.setStartPositions(startPositions);
-
-            // プレイヤー１
-            var player1 = new GamePlayer(1, {name:"プレイヤー１"}, this);
-            this.addPlayer(player1);
-            // プレイヤー1に船を４つあげよう
-            player1.addFune(new CaptainFune(1));
-            player1.addFune(new HayaiFune(2));
-            player1.addFune(new KataiFune(3));
-            player1.addFune(new KougekiFune(4));
-
-            this.placePlayerShips(player1);
-
-            // プレイヤー２
-            var player2;
-            if (opponent == "human") {
-                player2 = new GamePlayer(2, {name:"プレイヤー２"}, this);
-            } else if (opponent == "ai") {
-                player2 = new AIPlayer(2, {name:"プレイヤー２"}, this);
-            }
-
-            this.addPlayer(player2);
-            // プレイヤー1に船を４つあげよう
-            player2.addFune(new CaptainFune(1));
-            player2.addFune(new HayaiFune(2));
-            player2.addFune(new KataiFune(3));
-            player2.addFune(new KougekiFune(4));
-
-            this.placePlayerShips(player2);
-
-            this.sndManager.playBGM();
-            //ユニットの行動順番リストを作る
-            this.createTurnList();
-            //ゲームを開始する
-            this.startTurn();
-        },
-
         //ストーリーモードを開始する関数
         beginCampaignGame: function(stageId) {
             this.mode = "campaign";
@@ -3006,27 +2402,30 @@ window.onload = function(){
             }
 
             // プレイヤー１
-            var player1 = new GamePlayer(1, {name:"プレイヤー１"}, this);
+            var player1 = new GamePlayer(1, {name:"プレイヤー"}, this);
             this.addPlayer(player1);
 
             if (funeList) {
                 for(var funeIndex = 0; funeIndex < funeList.length; funeIndex++) {
-                    var fune = this.funeFactory(funeList[funeIndex]);
+                    var fune = this.unitFactory(funeList[funeIndex]);
                     player1.addFune(fune);
                 }
             } else {
                 // プレイヤー1に船を４つあげよう
                 //@mod 2015.0526 T.Masuda ユニット構成を変更しました 
-                player1.addFune(new Player01(11));
-                player1.addFune(new Player02(12));
-                player1.addFune(new Player02(12));
-                player1.addFune(new Player02(12));
+                player1.addFune(new Player01(1));
+                player1.addFune(new Player02(2));
+                player1.addFune(new Player02(2));
+                player1.addFune(new Player02(2));
             }
 
             // 船の初期の位置
             var startPositions = {
                 player1: [
-                    {i: 0, j: 8}, {i: 0, j: 6}, {i: 1, j: 7}, {i: 2, j: 8}
+                    {i: 0, j: 8},
+                    {i: 0, j: 6},
+                    {i: 1, j: 7},
+                    {i: 2, j: 8}
                 ],
             }
             this.setStartPositions(startPositions);
@@ -3034,7 +2433,7 @@ window.onload = function(){
             this.placePlayerShips(player1);
 
             if (this.getPlayer(2) == undefined) {
-                var player2 = new AIPlayer(2, {name:"敵"}, this);
+                var player2 = new AIPlayer(2, {name:"エネミー"}, this);
                 this.addPlayer(player2);
             }
 
@@ -3042,6 +2441,8 @@ window.onload = function(){
             stageId = stageId ? stageId: 1; 
             //ステージIDに応じたステージをセットする
             this.setupStage(stageId);
+            //マップデータをロードする
+            this.map.setStageMap(MAP_DATA[stageId - 1], stageId);            
 
             this.sndManager.playBGM();
             //@add 2015.0520 行動順リストを作る
@@ -3161,11 +2562,11 @@ window.onload = function(){
                 var entry = stageData.startPositions[i];	//敵ユニットデータをステージデータから取得する
 
                 //factoryメソッドで、ステージデータから取得した値を使ってユニットを作成する
-                var fune = this.funeFactory(entry.type);
+                var fune = this.unitFactory(entry.type);
                 //ユニットの中心のX座標を指定する
                 fune.originX = TIP_LENGTH / 2;
                 //逆向きにする
-                fune.scaleX = -1;
+                fune.fune.scaleX = -1;
                 //CPUプレイヤーにユニットを与える
                 player2.addFune(fune);
                 //ユニットをマップに配置する
@@ -3214,11 +2615,15 @@ window.onload = function(){
 
         //ターン終了の関数
         endTurn: function() {
+        	//@add 2015.0529 T.Masuda activeUnitが0以下になってエラーを起こすケースへの対応
+        	//activeUnitが0以下になっていたら0をセットする
+        	this.activeUnit = this.activeUnit < 0? 0:this.activeUnit;
         	//@add 2015.0526 T.Masuda 移動後の行動を選択するボタンを消すコードを追加しました
         	this.map.removeMoveButtons(this.map);
     		//@add 2015.0526 T.Masuda ユニットの移動力を戻す。
     		this.map.activeFune.stats.movement = this.map.activeFune.getMovementReserved();
         	//アクティブプレイヤーを取得する
+    		//@mod 2015.0529 T.Masuda バグ対応のため、アクティブプレイヤーの取得方法を変更しました。
             var player = this.getActivePlayer();
             player.setActive(false);	//アクティブプレイヤーを非アクティブ状態の設定にする
 
@@ -3282,44 +2687,6 @@ window.onload = function(){
             }
         },
         
-        //対戦モードを終了する関数
-        versusOver: function(winner) {
-            var touchable = new ShieldWindow(this);
-            utils.beginUIShield();
-
-            //バナー
-            var playerBanner = new Sprite(512, 256);
-            if (winner.id == 1) {
-                playerBanner.image = game.assets[uiPlayerBanner1];
-            } else if (winner.id == 2) {
-                playerBanner.image = game.assets[uiPlayerBanner2];
-            }
-
-            playerBanner.opacity = 0;
-            playerBanner.x = 480 -256;
-            playerBanner.y = 320 -128;
-            game.currentScene.addChild(playerBanner);
-
-            var self = this;
-            playerBanner.tl.fadeIn(20).delay(30).fadeOut(10).then(function() {
-                game.currentScene.removeChild(playerBanner);
-
-                var resultBanner = new Sprite(512, 256);
-                resultBanner.image = game.assets[uiWin];
-                resultBanner.opacity = 0;
-                resultBanner.touchEnabled = false;
-                resultBanner.x = 480 -256;
-                resultBanner.y = 320 -128;
-                game.currentScene.addChild(resultBanner);
-
-                resultBanner.tl.fadeIn(20).then(function(){
-                    touchable.onTouch = function() {
-                        location.reload();
-                    };
-                    utils.endUIShield();
-                });
-            });
-        },
 
         //ストーリーモード終了の関数
         campaignOver: function(winner) {
@@ -3342,16 +2709,37 @@ window.onload = function(){
                 //勝利時の処理
                 if (winner.id == 1) {
                     resultBanner.image = game.assets[uiWin];
+                    //@add 2015.0528 T.Masuda 勝敗が決まった後に残ったユニットを掃除します
+                    var player2 = self.getPlayer(2);
+                    if(self.turnList.length){
+                    	//現在のCPUプレイヤーのユニット所持数を取得する
+                    	var funeNumber = player2.funeList.length;
+                    	//ユニットリストの項目分ループする
+                    	for(var i = 0; i < funeNumber; i++){
+                    		var underdog = player2.funeList[0];
+                    		underdog.opacity = 0;
+                    		underdog.sinkShip();
+                    	}
+                    }
+                    //行動順をリセットする
+                    self.activeUnit = 0;
                     //タッチ処理
                     touchable.onTouch = function() {
-                    	
+                    	//ゲームクリアとなったら
+                    	if(self.stageId == StageData.length){
+                    		//ゲームクリアを伝える
+                    		alert("ゲームクリアおめでとうございます！");
+                    		//画面を更新してトップ画面へ戻る
+                    		location.reload();
+                    		//関数処理を終える
+                    		return false;
+                    	}
                     	//各プレイヤーを回復
                         self.refreshPlayer(self.getPlayer(1));
                         
                         //次のステージをセットする
                         self.setupStage(self.stageId + 1);
-                        //行動順をリセットする
-                        self.activeUnit = 0;
+                        self.map.setStageMap(MAP_DATA[self.stageId - 1], self.stageId);            
                         //ユニットの行動順番リストを作る
                         self.createTurnList();
                         //ステージデモを開始する
@@ -3360,18 +2748,8 @@ window.onload = function(){
                     };
                 //敗北時の処理
                 } else if (winner.id == 2) {
+                	//敗北のバナーを出す
                     resultBanner.image = game.assets[uiLose];
-                    //ツイートボタンのデータを作る
-                    var tweet = new TwitterButton({
-                    	//負けたステージの番号
-                        stageId: self.stageId,
-                        //ゲームのURL
-                        url: "https://dl.dropboxusercontent.com/u/4325065/pirateTactics/enchant.js-builds-0.8.1/game/pirates/head/index.html"
-                    });
-                    //ツイートボタンを追加する
-                    touchable.addChild(tweet);
-                    tweet.x = 480 -32;
-                    tweet.y = 450;
 
                     //画面クリック
                     touchable.onTouch = function() {
@@ -3476,61 +2854,28 @@ window.onload = function(){
         },
 
         //指定された船を造る関数
-        funeFactory: function(name) {
+        //@mod 2015.0531 T.Masuda 作成できるユニットを整理 関数名変更
+        unitFactory: function(name) {
             switch(name) {
-                //キャプテン
-            	case 1:
-                case "captain":
-                    return new CaptainFune(1);
-                //はやい船
-                case 2:
-                case "hayai":
-                    return new HayaiFune(2);
-                    //固い船
-                case 3:
-                case "katai":
-                    return new KataiFune(3);
-                    //攻撃型の船
-                case 4:
-                case "kougeki":
-                    return new KougekiFune(4);
-                    //雑魚敵船
-                case 5:
-                case "teki":
-                    return new TekiFune(5);
-                    //ボス船
-                case 6:
-                case "boss":
-                    return new BossFune(6);
-                case 7:
-                case "boss_teki":
-                	return new BossTeki(7);
-                case 8:
-                case "hayai_teki":
-                	return new HayaiTeki(8);
-                case 9:
-                case "katai_teki":
-                	return new KataiTeki(9);
-                case 10:
-                case "kougeki_teki":
-                	return new KougekiTeki(10);
-                //@add 2015.0526 T.Masuda プレイヤー01ユニット追加
-                case 11:
+                case 1:
                 case "Player01":
-                	return new Player01(11);
+                	return new Player01(1);
                 //@add 2015.0526 T.Masuda プレイヤー02ユニット追加
-                case 12:
+                case 2:
                 case "Player02":
-                	return new Player02(12);
-                case 13:
+                	return new Player02(2);
+                case 3:
                 case "enemy01":
-                	return new Enemy01(13);
-                case 14:
+                	return new Enemy01(3);
+                case 4:
                 case "enemy02":
-                	return new Enemy02(14);
-                case 15:
+                	return new Enemy02(4);
+                case 5:
                 case "enemy03":
-                	return new Enemy03(15);
+                	return new Enemy03(5);
+                case 6:
+                case "enemy04":
+                	return new Enemy04(6);
             }
         },
     })
@@ -3546,21 +2891,24 @@ window.onload = function(){
             this.turnLabel.x = TIP_LENGTH*5;
             this.turnLabel.y = GAME_SCREEN_HEIGHT -40;
             this.turnLabel.font = NORMAL_FONT_STYLE;
-            this.turnLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            this.turnLabel.color = FONT_WHITE;
 
             this.playerLabel = new Label();
             scene.addChild(this.playerLabel);
             this.playerLabel.x = TIP_LENGTH;
             this.playerLabel.y = GAME_SCREEN_HEIGHT -40;
             this.playerLabel.font = NORMAL_FONT_STYLE;
-            this.playerLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            this.playerLabel.color = FONT_WHITE;
 
             this.stageLabel = new Label();
             scene.addChild(this.stageLabel);
             this.stageLabel.x = TIP_LENGTH*8;
             this.stageLabel.y = GAME_SCREEN_HEIGHT -40;
             this.stageLabel.font = NORMAL_FONT_STYLE;
-            this.stageLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            this.stageLabel.color = FONT_WHITE;
 
             this.settingsButton = new Sprite(TIP_LENGTH, TIP_LENGTH);
             scene.addChild(this.settingsButton);
@@ -3610,13 +2958,12 @@ window.onload = function(){
             this.bgmPlaying = true;
 
             game.assets[sndBGM].play();
-            //ループ再生の設定を行う。ブラウザ別のaudioタグの実装ごとに対応した処理を行う
             if(game.assets[sndBGM].src){
                 game.assets[sndBGM].src.loop = true;
             } else {
                 game.currentScene.addChild(this);
             }
-            game.assets[sndBGM].volume = this.volume *0.3;
+            game.assets[sndBGM].volume = this.volume *0.5;
         },
 
         //繰り返し使う音を再生する関数
@@ -3713,21 +3060,24 @@ window.onload = function(){
             captainLabel.x = 0;
             captainLabel.y = 0;
             captainLabel.font = NORMAL_FONT_STYLE;
-            captainLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            captainLabel.color = FONT_WHITE;
 
             attackLabel = new Label("攻撃力："+fune.getAttack());
             statsGroup.addChild(attackLabel);
             attackLabel.x = 0;
             attackLabel.y = TIP_LENGTH *1;
             attackLabel.font = NORMAL_FONT_STYLE;
-            attackLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            attackLabel.color = FONT_WHITE;
 
             defenseLabel = new Label("防御力："+fune.getDefense());
             statsGroup.addChild(defenseLabel);
             defenseLabel.x = 0;
             defenseLabel.y = TIP_LENGTH *2;
             defenseLabel.font = NORMAL_FONT_STYLE;
-            defenseLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            defenseLabel.color = FONT_WHITE;
 
             //@mod 2015.0526 T.Masuda 移動力を、移動力を保存するメンバから取得するようにしました。 
             movementLabel = new Label("移動力："+fune.getMovementReserved());
@@ -3735,32 +3085,26 @@ window.onload = function(){
             movementLabel.x = 0;
             movementLabel.y = TIP_LENGTH *3;
             movementLabel.font = NORMAL_FONT_STYLE;
-            movementLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            movementLabel.color = FONT_WHITE;
 
             rangeLabel = new Label("攻撃の距離："+fune.getRange());
             statsGroup.addChild(rangeLabel);
             rangeLabel.x = 0;
             rangeLabel.y = TIP_LENGTH *4;
             rangeLabel.font = NORMAL_FONT_STYLE;
-            rangeLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            rangeLabel.color = FONT_WHITE;
 
             hpLabel = new Label("HP："+fune.getHP()+"/"+fune.getHPMax());
             statsGroup.addChild(hpLabel);
             hpLabel.x = 0;
             hpLabel.y = TIP_LENGTH *5;
             hpLabel.font = NORMAL_FONT_STYLE;
-            hpLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            hpLabel.color = FONT_WHITE;
 
             //ここまでステータス
-
-            //海賊の画像
-            //@mod 2015.0527 新キャラ画像が用意できるまで画像を表示しないようにします。
-//            var pirate = new Sprite(400, GAME_SCREEN_HEIGHT);
-//            pirate.x = 350;
-//            pirate.y = -50;
-//            pirate.opacity = 0;
-//            pirate.image = fune.getImage();
-//            windowGroup.addChild(pirate);
 
             //キャンセルボタン
             var self = this;
@@ -3839,19 +3183,6 @@ window.onload = function(){
     })
 
 
-    //ツイートボタン
-    var TwitterButton = Class.create(Sprite, {
-        initialize: function(options) {
-            Sprite.call(this, TIP_LENGTH, TIP_LENGTH);
-            this.image = game.assets[uiTwitterBtnSprite];
-            this.stageId = options.stageId;
-            this.url     = options.url;
-        },
-
-        ontouchend: function(params) {
-            window.open("https://twitter.com/intent/tweet?url="+encodeURIComponent(this.url)+"&text="+encodeURIComponent("ステージ"+this.stageId+"まで行けました！みんなはどこまで行ける？")+"&hashtags=piratesTactics,海賊", "twitter", "top=50, left=50, width=500, height=400");
-        }
-    })
     
     /**
      * 操作不能のベール
@@ -3908,7 +3239,8 @@ window.onload = function(){
             messageLabel.x = windowSprite.x +40;
             messageLabel.y = windowSprite.y +TIP_LENGTH;
             messageLabel.font = NORMAL_FONT_STYLE;
-            messageLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            messageLabel.color = FONT_WHITE;
             //@add 2015.0525 クラスオブジェクトにラベルへの参照を持たせました
             this.messageLabel = messageLabel;
             
@@ -3946,7 +3278,7 @@ window.onload = function(){
      */
     var DemoWindow = Class.create(AlertWindow, {
     	//コンストラクタ
-        initialize: function(message, gameManager, image) {
+        initialize: function(message, gameManager, image, font) {
         	//お知らせウィンドウのコンストラクタを実行する
         	AlertWindow.call(this, message,gameManager);
         	//デモウィンドウ用のフォントを指定する
@@ -3979,10 +3311,12 @@ window.onload = function(){
         		label.text = text.substr(0, MESSAGE_NUMBER_PER_LINE);
         		//切り出した残りを自らにセットする
         		text = text.substr(MESSAGE_NUMBER_PER_LINE);
-        		label.font = DEMO_FONT_STYLE;	//このウィンドウ用のフォントをセットする
-        		label.color = FONT_YELLOW;		//フォントの色をセットする
+        		//このウィンドウ用のフォントをセットする。引数にフォントが指定してあればそちらを使う
+        		label.font = font === void(0) || font == ''?DEMO_FONT_STYLE:font;	
+        		label.color = FONT_WHITE;		//フォントの色をセットする
         		//ラベルの座標をセットする。顔グラフィックからずらす。
-        		label.x = this.windowSprite.x + WINDOW_MARGIN + FACE_IMAGE_SIZE;
+        		//@mod 2015.0530 T.Masuda 顔グラフィック未使用につき幅変更
+        		label.x = this.windowSprite.x + WINDOW_MARGIN;
         		label.y = this.windowSprite.y + (DEMOWINDOW_LABEL_HEIGHT * (i + 1));
         	}
         }
@@ -4022,7 +3356,8 @@ window.onload = function(){
             soundLabel.x = 0;
             soundLabel.y = 16;
             soundLabel.font = NORMAL_FONT_STYLE;
-            soundLabel.color = FONT_YELLOW;
+            //@mod 2015.0530 T.Masuda フォントカラーを白に変更
+            soundLabel.color = FONT_WHITE;
 
             var sndUpButton = new Sprite(TIP_LENGTH, TIP_LENGTH);
             settingsGroup.addChild(sndUpButton);
@@ -4122,81 +3457,30 @@ window.onload = function(){
             this.addChild(shieldSprite);
 
             var windowGroup = new Group();
-            windowGroup.x = (GAME_SCREEN_WIDTH -512)/2;
-            windowGroup.y = (GAME_SCREEN_HEIGHT -512)/2;
+            //@mod 2015.0529 T.Masuda 画面いっぱいの写真を使うため、座標を0にしました
+            windowGroup.x = 0;
+            windowGroup.y = 0;
             this.addChild(windowGroup);
 
-            var windowSprite = new Sprite(512, 512);
+            //@mod 2015.0529 T.Masuda タイトル画面を写真にしました
+            var windowSprite = new Sprite(TIP_LENGTH*13, TIP_LENGTH*9);
             windowSprite.image = game.assets[uiStartScreen];
+            windowSprite.x = TIP_LENGTH;
+            windowSprite.y = 10;
             windowGroup.addChild(windowSprite);
 
-            var self = this;
-            var versusBtnSprite = new Sprite(128, TIP_LENGTH);
-            versusBtnSprite.image = game.assets[uiVersusBtnSprite];
-            versusBtnSprite.x = TIP_LENGTH *1.5;
-            versusBtnSprite.y = 512 -TIP_LENGTH -32;
-            windowGroup.addChild(versusBtnSprite);
-
-            var campaignBtnSprite = new Sprite(128, TIP_LENGTH);
-            campaignBtnSprite.image = game.assets[uiStoryBtnSprite];
-            campaignBtnSprite.x = TIP_LENGTH *4.5;
-            campaignBtnSprite.y = 512 -TIP_LENGTH -32;
-            windowGroup.addChild(campaignBtnSprite);
-
+            //@add 2015.0529 T.Masuda タイトルの画像を配置します
+            var titleSprite = new Sprite(TIP_LENGTH*8, TIP_LENGTH*1.5);
+            titleSprite.image = game.assets[titleLogo];
+            titleSprite.x = 224;
+            titleSprite.y = TIP_LENGTH;
+            windowGroup.addChild(titleSprite);
+            
             windowGroup.originX = 256;
             windowGroup.originY = 256;
-
-            versusBtnSprite.addEventListener(enchant.Event.TOUCH_START, function(params) {
-                versusBtnSprite.tl.scaleTo(1.1, 10, enchant.Easing.ELASTIC_EASEOUT)
-            });
-
-            versusBtnSprite.addEventListener(enchant.Event.TOUCH_END, function(params) {
-                shieldSprite.tl.fadeTo(0, 5);
-                versusBtnSprite.tl.scaleTo(0.9, 3).and().fadeTo(0, 5);
-                windowSprite.tl.fadeTo(0, 5).then(function() {
-                    gameManager.sndManager.playFX(sndClick);
-                    game.popScene();
-                    new VersusScreen(gameManager);
-                });
-            });
-
-            campaignBtnSprite.addEventListener(enchant.Event.TOUCH_START, function(params) {
-                campaignBtnSprite.tl.scaleTo(1.1, 10, enchant.Easing.ELASTIC_EASEOUT)
-            });
-
-            campaignBtnSprite.addEventListener(enchant.Event.TOUCH_END, function(params) {
-                campaignBtnSprite.tl.scaleTo(0.9, 3).and().fadeTo(0, 5);
-                windowSprite.tl.fadeTo(0, 5).then(function() {
-                    gameManager.sndManager.playFX(sndClick);
-                    game.popScene();
-                    new CampaignScreen(gameManager);
-                });
-            });
-        },
-    })
-
-    /**
-     * ストーリーモードの開始画面
-     */
-    var CampaignScreen = Class.create(Scene, {
-        initialize: function(gameManager) {
-            Scene.call(this);
-            game.pushScene(this);
-
-            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
-            shieldSprite.image = game.assets[ui1x1Black];
-            shieldSprite.opacity = 0.5
-            this.addChild(shieldSprite);
-
-            var windowGroup = new Group();
-            windowGroup.x = (GAME_SCREEN_WIDTH -512)/2;
-            windowGroup.y = (GAME_SCREEN_HEIGHT -512)/2;
-            this.addChild(windowGroup);
-
-            var windowSprite = new Sprite(512, 512);
-            windowSprite.image = game.assets[uiStoryScreen];
-            windowGroup.addChild(windowSprite);
-
+            
+            //@mod 2015.0529 T.Masuda タイトル画面とストーリーモード選択画面を統合しました
+            //以下のコードはストーリーモード用のウィンドウから移植しました。
             var self = this;
 
             var saveData = $.jStorage.get("save data");
@@ -4204,7 +3488,7 @@ window.onload = function(){
                 console.log("Found Save Data", saveData.stageId)
                 var continueBtnSprite = new Sprite(128, TIP_LENGTH);
                 continueBtnSprite.image = game.assets[uiContinueBtnSprite];
-                continueBtnSprite.x = TIP_LENGTH *1.5;
+                continueBtnSprite.x = TIP_LENGTH *4.5;
                 continueBtnSprite.y = 512 -TIP_LENGTH -32;
                 windowGroup.addChild(continueBtnSprite);
 
@@ -4227,7 +3511,7 @@ window.onload = function(){
 
             var newBtnSprite = new Sprite(128, TIP_LENGTH);
             newBtnSprite.image = game.assets[uiNewBtnSprite];
-            newBtnSprite.x = TIP_LENGTH *4.5;
+            newBtnSprite.x = TIP_LENGTH *8.5;
             newBtnSprite.y = 512 -TIP_LENGTH -32;
             windowGroup.addChild(newBtnSprite);
 
@@ -4250,78 +3534,447 @@ window.onload = function(){
                     gameManager.loadStageDemo(gameManager.stageId , gameManager);
                 });
             });
-        },
+            //ここまで移植
+        }
     })
 
-    //対戦モードの開始ウィンドウ
-    var VersusScreen = Class.create(Scene, {
-        initialize: function(gameManager) {
-            Scene.call(this);
-            game.pushScene(this);
+    //プレイヤー兵1(チーフ)。隊長であり、やられると負けとなる
+    var Player01 = Class.create(BaseFune, {
+    	initialize: function(id) {
+        	//@mod 2015.0527 T.Masuda ステータスを調整しました。リーダーとして優秀なステータスを設定しました。
+    		BaseFune.call(this, id, {
+    			movement:  4,
+    			range:     3,
+    			attack:   80,
+    			defense:  70,
+    			hpMax:   100,
+    			speed:	8
+    		});
 
-            var shieldSprite = new Sprite(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
-            shieldSprite.image = game.assets[ui1x1Black];
-            shieldSprite.opacity = 0.5
-            this.addChild(shieldSprite);
+    		//高さを変更する
+    		this.fune.height = PLAYER_SOLDIER_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = PLAYER_SOLDIER_HEIGHT - TIP_LENGTH;
+    		
+    		//プレイヤー1兵のスプライトシートを使う
+    		this.fune.image = game.assets[player01]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.front;
+    		this.fune.sinkFrame = SINK_FRAME.front;
+    		//@mod 2015 05.28 T.Masuda キャラの向きのパラメーターを追加しました
+    		//キャラ画像の向き。正面
+    		this.imageDirection = 'front';
+    	},
+    	
+    	getCaptainName: function() {
+    		return "チーフ";
+    	},
+    	
+        /*
+         * 関数名:getUnitName
+         * 引数  :なし
+         * 戻り値:String:ユニット名を返す
+         * 概要  :ユニット名の文字列を返す
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "player01";
+    	},
+    	
+    	getSkillName: function() {
+    		return "応急手当:味方全員を回復する";
+    	},
+    	
+    	processSkill: function(onEnd) {
+    		var count = this.player.getFuneCount();
+    		for(var i=0; i < count; i++) {
+    			var fune = this.player.getFune(i);
+    			var toHeal = Math.ceil(fune.getHPMax() /2);
+    			fune.healDamage(toHeal);
+    		}
+    		onEnd();
+    	},
+    	
+    	//やられ処理の関数を上書きする
+    	sinkShip: function() {
+    		this.player.controller.sndManager.playFX(sndSinkShip);
+    		//隊長の生存フラグを下ろし、ターン終了の関数で負けにする
+    		this.player.leaderLiving = false;
+    		
+    		this.player.removeFune(this);
+    		this.counter = 1;
 
-            var windowGroup = new Group();
-            windowGroup.x = (GAME_SCREEN_WIDTH -512)/2;
-            windowGroup.y = (GAME_SCREEN_HEIGHT -512)/2;
-            this.addChild(windowGroup);
+            this.fune.frame = this.fune.sinkFrame;
+            this.fune.originX = this.fune.width / 2;
+            this.fune.originY = this.fune.height -6;
+            this.fune.rotate(90);
+    		this.onenterframe = function(){ // enterframe event listener
+    			            this.counter++;
+    			if (this.counter == 12 ) {
+    				this.parentNode.removeChild(this);
+    			}
+    		};
+    	}
+    });
 
-            var windowSprite = new Sprite(512, 512);
-            windowSprite.image = game.assets[uiVSScreen];
-            windowGroup.addChild(windowSprite);
+    //プレイヤー兵2。複数存在する
+    var Player02 = Class.create(BaseFune, {
+    	//@mod 2015.0527 T.Masuda ステータスを調整しました。一兵卒ステータスにしました
+    	initialize: function(id) {
+    		BaseFune.call(this, id, {
+    			movement:  3,
+    			range:     3,
+    			attack:  70,
+    			defense:  50,
+    			hpMax:   70,
+    			speed:	5
+    		});
+ 
+    		
+    		//高さを変更する
+    		this.fune.height = PLAYER_SOLDIER_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = PLAYER_SOLDIER_HEIGHT - TIP_LENGTH;
+    		
+    		//プレイヤー2兵のスプライトシートを使う
+    		this.fune.image = game.assets[player02]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.front;
+    		this.fune.sinkFrame = SINK_FRAME.front;
+    		//@mod 2015 05.28 T.Masuda キャラの向きのパラメーターを追加しました
+    		//キャラ画像の向き。正面
+    		this.imageDirection = 'front';
+    	},
+    	
+    	getCaptainName: function() {
+    		return "隊員";
+    	},
 
-            var self = this;
-
-            var humanBtnSprite = new Sprite(128, TIP_LENGTH);
-            humanBtnSprite.image = game.assets[uiHumanBtnSprite];
-            humanBtnSprite.x = TIP_LENGTH *1.5;
-            humanBtnSprite.y = 512 -TIP_LENGTH -32;
-            windowGroup.addChild(humanBtnSprite);
-
-            windowGroup.originX = 256;
-            windowGroup.originY = 256;
-
-            humanBtnSprite.addEventListener(enchant.Event.TOUCH_START, function(params) {
-                humanBtnSprite.tl.scaleTo(1.1, 10, enchant.Easing.ELASTIC_EASEOUT)
+        /*
+         * 関数名:getUnitName
+         * 引数  :なし
+         * 戻り値:String:ユニット名を返す
+         * 概要  :ユニット名の文字列を返す
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "player02";
+    	},
+    	
+    	getSkillName: function() {
+    		return "バレットフィーバー:周囲の敵全員を攻撃";
+    	},
+    	
+    	processSkill: function(onEnd) {
+    		var damage = this.stats.attack;
+    		var count = this.player.controller.getNonActivePlayer().getFuneCount();
+    		for(var i=0; i < count; i++) {
+    			var fune = this.player.controller.getNonActivePlayer().getFune(i);
+    			if (this.withinRange(fune.i, fune.j)) {
+    				var afterHp = fune.takeDamage(damage);
+    				var explosion = new Explosion();
+    				//@mod 2015.0528 T.Masuda 爆発アニメから銃撃アニメに変わり、画像サイズがマス目と同じになったため補正値を外しました
+    				explosion.x = fune.x;
+    				explosion.y = fune.y;
+    				this.player.controller.sndManager.playFX(sndExplosion);
+    				game.currentScene.addChild(explosion);
+    				
+    				if (afterHp <= 0) {
+    					fune.sinkShip();
+    				}
+    			}
+    		}
+    		onEnd();
+    	},
+    });    
+    
+    //敵兵01クラス。敵側指揮官ユニット。倒すとステージクリア。いなければ殲滅でクリア
+    var Enemy01 = Class.create(BaseFune, {
+    	//@mod 2015.0527 T.Masuda ステータスを調整しました。攻撃寄りです
+        initialize: function(id) {
+            BaseFune.call(this, id, {
+                movement:  4,
+                range:     3,
+                attack:   55,
+                defense:  45,
+                hpMax:    80,
+                speed:	7
             });
 
-            humanBtnSprite.addEventListener(enchant.Event.TOUCH_END, function(params) {
-                shieldSprite.tl.fadeTo(0, 5);
-                humanBtnSprite.tl.scaleTo(0.9, 3).and().fadeTo(0, 5);
-                windowSprite.tl.fadeTo(0, 5).then(function() {
-                    gameManager.beginVersusGame("human");
-                    gameManager.sndManager.playFX(sndClick);
-                    game.popScene();
-                });
-            });
-
-            var cpuBtnSprite = new Sprite(128, TIP_LENGTH);
-            cpuBtnSprite.image = game.assets[uiCpuBtnSprite];
-            cpuBtnSprite.x = TIP_LENGTH *4.5;
-            cpuBtnSprite.y = 512 -TIP_LENGTH -32;
-            windowGroup.addChild(cpuBtnSprite);
-
-            windowGroup.originX = 256;
-            windowGroup.originY = 256;
-
-            cpuBtnSprite.addEventListener(enchant.Event.TOUCH_START, function(params) {
-                cpuBtnSprite.tl.scaleTo(1.1, 10, enchant.Easing.ELASTIC_EASEOUT)
-            });
-
-            cpuBtnSprite.addEventListener(enchant.Event.TOUCH_END, function(params) {
-                shieldSprite.tl.fadeTo(0, 5);
-                cpuBtnSprite.tl.scaleTo(0.9, 3).and().fadeTo(0, 5);
-                windowSprite.tl.fadeTo(0, 5).then(function() {
-                    gameManager.beginVersusGame("ai");
-                    gameManager.sndManager.playFX(sndClick);
-                    game.popScene();
-                });
-            });
+    		//高さを変更する
+    		this.fune.height = ENEMY_SOLDIER_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = ENEMY_SOLDIER_HEIGHT - TIP_LENGTH;
+    		
+    		//敵兵01のスプライトシートを使う
+    		this.fune.image = game.assets[enemy01]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.front;
+    		this.fune.sinkFrame = SINK_FRAME.front;
+    		//@mod 2015 05.28 T.Masuda キャラの向きのパラメーターを追加しました
+    		//キャラ画像の向き。正面
+    		this.imageDirection = 'front';
         },
-    })
+
+        getCaptainName: function() {
+            return "警備兵:隊長";
+        },
+
+        /*
+         * 関数名:getUnitName
+         * 引数  :なし
+         * 戻り値:String:ユニット名を返す
+         * 概要  :ユニット名の文字列を返す
+         * 作成日:2015.05.26
+         * 作成者:T.M
+         */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "enemy01";
+    	},
+        
+        getSkillName: function() {
+            return "無差別発砲:周囲の敵全員を攻撃";
+        },
+
+        processSkill: function(onEnd) {
+    		var damage = this.stats.attack;
+    		var count = this.player.controller.getNonActivePlayer().getFuneCount();
+    		for(var i=0; i < count; i++) {
+    			var fune = this.player.controller.getNonActivePlayer().getFune(i);
+    			if (this.withinRange(fune.i, fune.j)) {
+    				var afterHp = fune.takeDamage(damage);
+    				var explosion = new Explosion();
+    				//@mod 2015.0528 T.Masuda 爆発アニメから銃撃アニメに変わり、画像サイズがマス目と同じになったため補正値を外しました
+    				explosion.x = fune.x;
+    				explosion.y = fune.y;
+    				this.player.controller.sndManager.playFX(sndExplosion);
+    				game.currentScene.addChild(explosion);
+    				
+    				if (afterHp <= 0) {
+    					fune.sinkShip();
+    				}
+    			}
+    		}
+            onEnd();
+        },
+    	//やられ処理の関数を上書きする
+    	sinkShip: function() {
+    		this.player.controller.sndManager.playFX(sndSinkShip);
+    		//隊長の生存フラグを下ろし、ターン終了の関数で負けにする
+    		this.player.leaderLiving = false;
+    		
+    		this.player.removeFune(this);
+    		this.counter = 1;
+    		this.fune.frame = this.fune.sinkFrame;
+            this.fune.originX = this.fune.width / 2;
+            this.fune.originY = this.fune.height -6;
+            this.fune.rotate(90);
+
+    		this.onenterframe = function(){ // enterframe event listener
+    			            this.counter++;
+    			if (this.counter == 12 ) {
+    				this.parentNode.removeChild(this);
+    			}
+    		};
+    	}
+    });
+
+    //敵兵02クラス
+    var Enemy02 = Class.create(BaseFune, {
+    	initialize: function(id) {
+        	//@mod 2015.0527 T.Masuda ステータスを調整しました。防御寄りです
+    		BaseFune.call(this, id, {
+    			movement:  3,
+    			range:     4,
+    			attack:   50,
+    			defense:  60,
+    			hpMax:    50,
+    			speed:	2
+    		});
+    		
+    		//高さを変更する
+    		this.fune.height = ENEMY_SOLDIER_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = ENEMY_SOLDIER_HEIGHT - TIP_LENGTH;
+    		
+    		//敵兵02のスプライトシートを使う
+    		this.fune.image = game.assets[enemy02]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.quarter;
+    		this.fune.sinkFrame = SINK_FRAME.quarter;
+    		//@mod 2015 05.28 T.Masuda キャラの向きのパラメーターを追加しました
+    		//キャラ画像の向き。斜め
+    		this.imageDirection = 'quarter';
+    	},
+    	
+    	getCaptainName: function() {
+    		return "警備兵:2";
+    	},
+    	
+    	/*
+    	 * 関数名:getUnitName
+    	 * 引数  :なし
+    	 * 戻り値:String:ユニット名を返す
+    	 * 概要  :ユニット名の文字列を返す
+    	 * 作成日:2015.05.26
+    	 * 作成者:T.M
+    	 */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "enemy02";
+    	},
+    	
+    	getSkillName: function() {
+    		return "奮起:攻撃力・防御力 小UP";
+    	},
+    	
+    	processSkill: function(onEnd) {
+    		this.stats.attack  += 5;
+    		this.stats.defense += 5;
+    		onEnd();
+    	},
+    });
+    
+    //敵兵03クラス
+    var Enemy03 = Class.create(BaseFune, {
+    	initialize: function(id) {
+        //@mod 2015.0527 T.Masuda ステータスを調整しました。スピード寄りです
+   		BaseFune.call(this, id, {
+    			movement:  5,
+    			range:     2,
+    			attack:   50,
+    			defense:  40,
+    			hpMax:    50,
+    			speed:	6
+    		});
+    		
+    		//高さを変更する
+    		this.fune.height = ENEMY_SOLDIER_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = HIGH_TIP_HEIGHT - TIP_LENGTH;
+    		
+    		//敵兵01のスプライトシートを使う
+    		this.fune.image = game.assets[enemy03]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.front;
+    		this.fune.sinkFrame = SINK_FRAME.front;
+    		//@mod 2015 05.28 T.Masuda キャラの向きのパラメーターを追加しました
+    		//キャラ画像の向き。正面
+    		this.imageDirection = 'front';
+    	},
+    	
+    	getCaptainName: function() {
+    		return "警備兵:03";
+    	},
+    	
+    	/*
+    	 * 関数名:getUnitName
+    	 * 引数  :なし
+    	 * 戻り値:String:ユニット名を返す
+    	 * 概要  :ユニット名の文字列を返す
+    	 * 作成日:2015.05.26
+    	 * 作成者:T.M
+    	 */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "enemy03";
+    	},
+    	
+    	getSkillName: function() {
+    		return "慎重に行動:防御力UP 移動力DOWN";
+    	},
+    	
+    	processSkill: function(onEnd) {
+    		this.stats.defense += 10;
+    		this.stats.movement -= 1;
+    		this.movementReserved -= 1;
+    		onEnd();
+    	},
+    });
+    
+    //敵兵04クラス。生体兵器(ゾンビのようなモンスター)
+    var Enemy04 = Class.create(BaseFune, {
+    	initialize: function(id) {
+    		//@mod 2015.0527 ステータスを調整しました。近接型のパラメータです。
+    		BaseFune.call(this, id, {
+    			movement:  5,
+    			range:     1,
+    			attack:   80,
+    			defense:  70,
+    			hpMax:    70,
+    			speed:	7
+    		});
+    		
+    		//高さを変更する
+    		this.fune.height = MONSTER_HEIGHT;
+    		//幅を変更する
+    		this.fune.width = TIP_LENGTH;
+    		
+    		//Y座標補正用メンバを追加する
+    		this.replaceY = MONSTER_HEIGHT - TIP_LENGTH;
+    		
+    		//敵兵04のスプライトシートを使う
+    		this.fune.image = game.assets[enemy04]; 
+    		//アニメ設定           
+    		this.fune.frame = TO_SIDE_FRAME.front;
+    		this.fune.sinkFrame = SINK_FRAME.front;
+    		//@mod 2015 05.28 T.Masuda キャラの向きのパラメーターを追加しました
+    		//キャラ画像の向き。正面
+    		this.imageDirection = 'front';
+    	},
+    	
+    	getCaptainName: function() {
+    		return "生体兵器";
+    	},
+    	
+    	/*
+    	 * 関数名:getUnitName
+    	 * 引数  :なし
+    	 * 戻り値:String:ユニット名を返す
+    	 * 概要  :ユニット名の文字列を返す
+    	 * 作成日:2015.05.26
+    	 * 作成者:T.M
+    	 */
+    	getUnitName: function() {
+    		//ユニット名を返す
+    		return "enemy04";
+    	},
+
+    	//@mod 2015.0527 T.Masuda スキル名を変えました
+    	getSkillName: function() {
+    		return "強襲:攻撃力・移動力UP 防御力DOWN";
+    	},
+    	
+    	//@mod 2015.0527 T.Masuda スキルで上昇するパラメータを攻撃力と防御力から、攻撃力と移動力に変えました
+    	processSkill: function(onEnd) {
+    		this.stats.attack  += 10;
+    		this.stats.defense  -= 20;
+    		this.stats.movement += 2;
+    		this.movementReserved += 2;
+    		onEnd();
+    	},
+    });
+    
     /**
      * ロードが完了した直後に実行される関数を指定している。
      */
@@ -4331,20 +3984,8 @@ window.onload = function(){
         // ゲームロジックの管理
         var manager = new GameManager();
 
-        // マスのデータ
-        var mapDisplayData = [
-            [3, 3, 2, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0],
-            [3, 2, 0, 0, 2, 3, 3, 2, 0, 1, 0, 0, 0],
-            [3, 0, 4, 0, 2, 3, 3, 2, 0, 0, 0, 0, 0],
-            [3, 0, 0, 0, 0, 2, 2, 0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 0, 4, 0, 0, 0, 1, 1, 0, 4, 0],
-            [1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2],
-            [0, 0, 0, 3, 3, 2, 0, 0, 0, 0, 4, 2, 3],
-            [0, 0, 0, 3, 3, 3, 2, 0, 0, 2, 2, 3, 3],
-        ];
-
-        var map = new GameMap(sceneGameMain, mapDisplayData, manager);
+        //@mod 2015.0528 T,Masuda マスのデータを定数から取るようにしました
+        var map = new GameMap(sceneGameMain, MAP_DATA[0], manager);
         manager.setMap(map);
 
         var frameUI = new FrameUI(sceneGameMain);
