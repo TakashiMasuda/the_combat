@@ -63,7 +63,10 @@ TURNBACK_OPACITY = 0.75;
 //ラベルボタン関連の定数
 CANCEL_LABEL = "キャンセル";	//キャンセルボタン用のテキスト
 MOVE_CONFIRM_LABEL = "待機";	//待機ボタン用のテキスト
+LABEL_BUTTON_FIX_Y = 16;	//Y座標補正値
 BUTTON_WIDTH = 100;	//ボタンの幅
+BUTTON_HEIGHT = 22;	//ボタンの高さ
+BUTTON_OPACITY = 0.6;	//ボタンの透過率
 
 
 //フォント設定
@@ -80,7 +83,7 @@ FONT_YELLOW = "rgba(255, 255, 105, 1.0)";
 //白抜き文字
 FONT_WHITE = "rgba(255, 255, 255, 1.0)";
 //灰色の文字
-FONT_GRAY = "rgba(175, 175, 175, 1.0)";
+FONT_GRAY = "rgba(50, 50, 50, 1.0)";
 
 
 //ステージデモのメッセージ1行の文字数
@@ -835,7 +838,7 @@ window.onload = function(){
         	//移動後のキャンセルボタンを作る
         	var moveCancelButton = new Label(CANCEL_LABEL);
         	//キャンセルボタンに高さを指定する
-        	moveCancelButton.height = TIP_LENGTH;
+        	moveCancelButton.height = BUTTON_HEIGHT;
         	//キャンセルボタンに幅を指定する
         	moveCancelButton.width = BUTTON_WIDTH;
         	//キャンセルボタンを画面に追加する
@@ -846,6 +849,7 @@ window.onload = function(){
         	moveCancelButton.font = MOVE_BUTTON_FONT_STYLE;
         	moveCancelButton.color = FONT_GRAY;
         	moveCancelButton.backgroundColor = FONT_WHITE;
+        	moveCancelButton.opacity = BUTTON_OPACITY;
         	
         	return moveCancelButton;	//作成したボタンを返す
         },
@@ -862,7 +866,7 @@ window.onload = function(){
         	//移動後のキャンセルボタンを作る
         	var moveConfirmButton = new Label(MOVE_CONFIRM_LABEL);
         	//待機ボタンに高さを指定する
-        	moveConfirmButton.height = TIP_LENGTH;
+        	moveConfirmButton.height = BUTTON_HEIGHT;
         	//待機ボタンに幅を指定する
         	moveConfirmButton.width = BUTTON_WIDTH;
         	//待待機ボタンを画面に追加する
@@ -873,6 +877,7 @@ window.onload = function(){
         	moveConfirmButton.font = MOVE_BUTTON_FONT_STYLE;
         	moveConfirmButton.color = FONT_GRAY;
         	moveConfirmButton.backgroundColor = FONT_WHITE;
+        	moveConfirmButton.opacity = BUTTON_OPACITY;
 
         	return moveConfirmButton;	//作成したボタンを返す
         },
@@ -918,9 +923,9 @@ window.onload = function(){
         	
         	//ユニットの上に待機ボタンとキャンセルボタンを配置する
         	moveCancelButton.x = unit.x;
-        	moveCancelButton.y = unit.y - TIP_LENGTH / 3 + 3;
+        	moveCancelButton.y = unit.y - TIP_LENGTH / 3 + LABEL_BUTTON_FIX_Y;
         	moveConfirmButton.x = unit.x; 
-        	moveConfirmButton.y = unit.y - TIP_LENGTH * 2  / 3 + 3;
+        	moveConfirmButton.y = unit.y - TIP_LENGTH * 2  / 3 + LABEL_BUTTON_FIX_Y;
         	
         	//キャンセルボタンのイベントを登録する
         	moveCancelButton.ontouchend = function(){
